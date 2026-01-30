@@ -10,35 +10,33 @@
         
         #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; }
         #ad-top { top: 0; } #ad-bottom { bottom: 0; }
-        .ad-frame { border: none; width: 100%; height: 100px; display: block; }
 
-        /* 大広告オーバーレイ */
         #large-ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #close-ad-btn { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; align-self: flex-end; margin-right: 20px; display: none; } /* 初期は非表示 */
+        #close-ad-btn { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; align-self: flex-end; margin-right: 20px; display: none; }
 
         #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
         #stat-bar { height: 40px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 12px; }
-        #customer-area { flex-grow: 1; padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; overflow-y: auto; background: #f8fafc; }
+        #customer-area { flex-grow: 1; padding: 15px; display: flex; flex-wrap: wrap; gap: 12px; align-content: flex-start; overflow-y: auto; background: #f8fafc; }
         
-        .customer { width: 75px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; animation: pop 0.3s ease-out; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .patience-bar { width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        /* お客さんを大きく調整 */
+        .customer { width: 100px; background: #fff; border: 2px solid #e2e8f0; border-radius: 15px; padding: 8px; display: flex; flex-direction: column; align-items: center; animation: pop 0.3s ease-out; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .patience-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
-        #action-panel { height: 90px; background: #fff; border-top: 2px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; padding: 0 5px; }
-        .task-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; color: white; box-shadow: 0 4px #cbd5e1; }
-        .btn-red { background: #ef4444; } .btn-blue { background: #3b82f6; } .btn-green { background: #22c55e; } .btn-yellow { background: #eab308; }
+        #action-panel { height: 110px; background: #fff; border-top: 2px solid #e2e8f0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; padding: 5px; overflow-y: auto; }
+        .task-btn { width: 55px; height: 55px; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 24px; background: #f8fafc; box-shadow: 0 3px #cbd5e1; display: flex; align-items: center; justify-content: center; }
+        .task-btn:active { transform: translateY(2px); box-shadow: none; }
 
         #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 10px; color: white; overflow-y: auto; }
-        
-        .shop-box { background: rgba(255,255,255,0.1); width: 92%; border-radius: 12px; padding: 8px; margin: 5px 0; border: 1px solid #475569; }
-        .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; font-size: 11px; }
-        .buy-btn { background: #facc15; border: none; padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 10px; cursor: pointer; min-width: 65px; color: #000; }
-        .buy-btn:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
+        .shop-box { background: rgba(255,255,255,0.1); width: 92%; border-radius: 12px; padding: 10px; margin: 5px 0; border: 1px solid #475569; }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; font-size: 12px; }
+        .buy-btn { background: #facc15; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 11px; cursor: pointer; color: #000; }
+        .buy-btn:disabled { background: #475569; color: #94a3b8; }
 
-        .start-option { width: 260px; padding: 10px; font-size: 12px; margin-top: 6px; background: #334155; border-radius: 10px; text-align: center; cursor: pointer; border: 1px dashed #64748b; color: #e2e8f0; }
+        .start-option { width: 260px; padding: 12px; font-size: 14px; margin-top: 8px; background: #334155; border-radius: 30px; text-align: center; cursor: pointer; border: 2px solid #facc15; color: #facc15; font-weight: bold; }
 
-        .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 8px; margin-top: 10px; padding-bottom: 25px; }
-        .menu-btn { width: 260px; padding: 12px; font-size: 15px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
+        .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 10px; margin-top: 15px; padding-bottom: 30px; }
+        .menu-btn { width: 280px; padding: 14px; font-size: 16px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
         #start-btn { background: #22c55e; color: white; }
         #more-games-btn { background: #ff4081; color: white; }
 
@@ -52,25 +50,20 @@
         <iframe id="frame-large" src="ad_large.html" style="width:300px; height:250px; border:none; background:#fff;"></iframe>
     </div>
 
-    <div id="ad-top"><iframe id="frame-top" class="ad-frame" src="ad.html"></iframe></div>
+    <div id="ad-top"><iframe id="frame-top" src="ad.html" style="border:none; width:100%; height:100px;"></iframe></div>
 
     <div id="game-outer">
         <div id="stat-bar">
             <span id="score-txt">SCORE: 0</span>
-            <span id="level-txt">LEVEL: 1</span>
+            <span id="stage-txt">STAGE: 1</span>
             <span id="coin-display" style="color:#facc15">💰 0</span>
         </div>
         <div id="customer-area"></div>
-        <div id="action-panel">
-            <button class="task-btn btn-red" onclick="provide('🍎')">🍎</button>
-            <button class="task-btn btn-blue" onclick="provide('💧')">💧</button>
-            <button class="task-btn btn-green" onclick="provide('🌿')">🌿</button>
-            <button class="task-btn btn-yellow" onclick="provide('⭐')">⭐</button>
-        </div>
+        <div id="action-panel"></div>
 
         <div id="menuScreen">
-            <h2 id="result-msg" style="margin:2px 0; color:#22c55e; font-size:20px;">Task Master</h2>
-            <div id="coin-total" style="font-size:16px; color:#facc15;">Total 💰: 0</div>
+            <h2 id="result-msg" style="margin:5px 0; color:#22c55e; font-size:22px;">Task Master</h2>
+            <div id="coin-total" style="font-size:18px; color:#facc15;">Total 💰: 0</div>
 
             <div class="shop-box">
                 <div class="shop-item">
@@ -78,36 +71,42 @@
                     <button class="buy-btn" id="btn-p" onclick="buy('patience')">💰 <span id="cost-p">500</span></button>
                 </div>
                 <div class="shop-item">
-                    <span>👥 初期客数 (Lv.<span id="up-c-lv">0</span>)</span>
+                    <span>👥 初期客数 (+<span id="up-c-lv">0</span>)</span>
                     <button class="buy-btn" id="btn-c" onclick="buy('count')">💰 <span id="cost-c">1000</span></button>
                 </div>
                 <div class="shop-item">
                     <span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span>
                     <button class="buy-btn" id="btn-v" onclick="buy('value')">💰 <span id="cost-v">10</span></button>
                 </div>
-                <div style="font-size:10px; color:#94a3b8; text-align:center;">現在の単価: 💰 <span id="current-val">10</span></div>
+                <div style="font-size:10px; color:#94a3b8; text-align:center;">基本単価: 💰 <span id="current-val">10</span></div>
             </div>
 
             <div id="skip-options">
-                <div class="start-option" id="skip-lv2" onclick="startAt(2, 1000)">Lv2から開始 (💰 1000)</div>
-                <div class="start-option" id="skip-lv3" onclick="startAt(3, 2000)">Lv3から開始 (💰 2000)</div>
+                <div class="start-option" id="skip-lv2" onclick="startAt(2, 1000)">Stage 2 から開始 (💰 1000)</div>
             </div>
 
             <div class="menu-btn-group">
                 <button id="start-btn" class="menu-btn" onclick="startGame()">★ 開店 ★</button>
-                <a href="https://saaaachi.github.io/Grow-Planet/" id="more-games-btn" class="menu-btn">★ 他のゲームはこちら ★</a>
+                <a href="https://saaaachi.github.io/Neo-Merge/" id="more-games-btn" class="menu-btn">★ 他のゲームはこちら ★</a>
             </div>
         </div>
     </div>
 
-    <div id="ad-bottom"><iframe id="frame-bottom" class="ad-frame" src="ad.html"></iframe></div>
+    <div id="ad-bottom"><iframe id="frame-bottom" src="ad.html" style="border:none; width:100%; height:100px;"></iframe></div>
 
     <script>
-        let score = 0, level = 1, customers = [], gameActive = false;
-        let gameOverCount = 0;
-        // 初期データを確実に数値(Number)にする
+        let score = 0, stage = 1, customers = [], gameActive = false, gameOverCount = 0;
         let userData = { coins: 0, upPatience: 0, upCount: 0, upValue: 0 };
-        const items = ['🍎', '💧', '🌿', '⭐'];
+        
+        // メニュー定義
+        const baseItems = ['🍎', '🌽', '🥤'];
+        const extraItems = [
+            { stage: 3, icon: '🥐', rate: 1.0 },
+            { stage: 5, icon: '🍩', rate: 1.5 },
+            { stage: 10, icon: '🎂', rate: 1.75 },
+            { stage: 15, icon: '🍺', rate: 2.0 }
+        ];
+
         const upgradeCosts = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000];
 
         function loadData() {
@@ -123,8 +122,13 @@
         }
         function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
 
+        function getBasePrice() {
+            // Lv1ごとに+2.35円、切り捨て
+            return Math.floor(10 + (userData.upValue * 2.35));
+        }
+
         function updateMenuUI() {
-            document.getElementById("coin-total").innerText = "Total 💰: " + userData.coins;
+            document.getElementById("coin-total").innerText = "Total 💰: " + Math.floor(userData.coins);
             document.getElementById("up-p-lv").innerText = userData.upPatience;
             document.getElementById("up-c-lv").innerText = userData.upCount;
             document.getElementById("up-v-lv").innerText = userData.upValue;
@@ -136,14 +140,14 @@
             document.getElementById("cost-p").innerText = costP;
             document.getElementById("cost-c").innerText = costC;
             document.getElementById("cost-v").innerText = costV;
-            document.getElementById("current-val").innerText = 10 + userData.upValue;
+            document.getElementById("current-val").innerText = getBasePrice();
 
-            // ボタン有効無効
             document.getElementById("btn-p").disabled = userData.coins < costP;
             document.getElementById("btn-c").disabled = userData.coins < costC;
             document.getElementById("btn-v").disabled = userData.coins < costV;
-            document.getElementById("skip-lv2").style.opacity = userData.coins >= 1000 ? "1" : "0.5";
-            document.getElementById("skip-lv3").style.opacity = userData.coins >= 2000 ? "1" : "0.5";
+            
+            // スキップボタン：Stage2開始のみ（所持金1000以上）
+            document.getElementById("skip-lv2").style.display = (userData.coins >= 1000) ? "block" : "none";
         }
 
         function buy(type) {
@@ -161,34 +165,56 @@
             saveData(); updateMenuUI();
         }
 
-        function startAt(targetLv, cost) {
+        function startAt(targetStage, cost) {
             if(userData.coins >= cost) {
                 userData.coins -= cost;
                 saveData();
-                level = targetLv;
-                score = (targetLv - 1) * 1000;
+                stage = targetStage;
+                score = (targetStage - 1) * 1000;
                 startGame(true);
             }
         }
 
+        function getCurrentItems() {
+            let list = [...baseItems];
+            extraItems.forEach(item => {
+                if (stage >= item.stage) list.push(item.icon);
+            });
+            return list;
+        }
+
         function startGame(isSkip = false) {
             document.getElementById("menuScreen").style.display = "none";
-            if(!isSkip) { score = 0; level = 1; }
+            if(!isSkip) { score = 0; stage = 1; }
             customers = []; gameActive = true;
+            createButtons();
             updateUI(); loop(); spawnCustomer();
+        }
+
+        function createButtons() {
+            const panel = document.getElementById("action-panel");
+            panel.innerHTML = "";
+            getCurrentItems().forEach(icon => {
+                const btn = document.createElement("button");
+                btn.className = "task-btn";
+                btn.innerText = icon;
+                btn.onclick = () => provide(icon);
+                panel.appendChild(btn);
+            });
         }
 
         function spawnCustomer() {
             if(!gameActive) return;
-            let baseRate = level >= 3 ? 1400 : 2500;
-            const maxCustomers = 2 + userData.upCount + Math.floor(level / 3);
+            let baseRate = stage >= 3 ? 1200 : 2500;
+            const maxCustomers = 2 + userData.upCount + Math.floor(stage / 3);
             if(customers.length < maxCustomers) {
-                let orderCount = (level >= 3 || (level >= 2 && score % 1000 >= 500)) ? 2 : 1;
+                let orderCount = (stage >= 3 || (stage >= 2 && score % 1000 >= 500)) ? 2 : 1;
                 let order = [];
-                for(let i=0; i<orderCount; i++) order.push(items[Math.floor(Math.random() * items.length)]);
+                let pool = getCurrentItems();
+                for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
                 customers.push({ id: Date.now(), order, patience: 100 });
             }
-            setTimeout(spawnCustomer, Math.max(700, baseRate - (level * 100)));
+            setTimeout(spawnCustomer, Math.max(600, baseRate - (stage * 80)));
         }
 
         function renderCustomers() {
@@ -198,9 +224,9 @@
                 const div = document.createElement("div");
                 div.className = "customer";
                 div.innerHTML = `
-                    <div style="font-size:24px;">👤</div>
-                    <div style="font-size:22px; margin:2px 0;">${c.order[0] || '✅'}</div>
-                    <div style="font-size:9px; color:#64748b;">${c.order.length > 1 ? '次は '+c.order[1] : '最後だよ'}</div>
+                    <div style="font-size:32px;">👤</div>
+                    <div style="font-size:30px; margin:5px 0;">${c.order[0] || '✅'}</div>
+                    <div style="font-size:11px; color:#64748b;">${c.order.length > 1 ? '次は '+c.order[1] : '最後だよ'}</div>
                     <div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${pColor(c.patience)}"></div></div>
                 `;
                 area.appendChild(div);
@@ -212,12 +238,20 @@
             if(!gameActive) return;
             for(let i=0; i<customers.length; i++) {
                 if(customers[i].order[0] === item) {
-                    customers[i].order.shift();
+                    const icon = customers[i].order.shift();
                     if(customers[i].order.length === 0) {
                         score += 100;
-                        userData.coins += (10 + userData.upValue);
+                        // 特殊アイテムの倍率計算
+                        let multiplier = 1.0;
+                        const spec = extraItems.find(ei => ei.icon === icon);
+                        if(spec) multiplier = spec.rate;
+                        
+                        userData.coins += (getBasePrice() * multiplier);
                         customers.splice(i, 1);
-                        if(score > 0 && score % 1000 === 0) level++;
+                        if(score > 0 && score % 1000 === 0) {
+                            stage++;
+                            createButtons(); // 新メニュー解放用
+                        }
                     }
                     updateUI(); renderCustomers(); return;
                 }
@@ -226,7 +260,7 @@
 
         function loop() {
             if(!gameActive) return;
-            let decay = 0.2 + (level * 0.05) - (userData.upPatience * 0.03);
+            let decay = 0.2 + (stage * 0.06) - (userData.upPatience * 0.03);
             customers.forEach(c => {
                 c.patience -= Math.max(0.1, decay);
                 if(c.patience <= 0) gameOver();
@@ -237,8 +271,8 @@
 
         function updateUI() {
             document.getElementById("score-txt").innerText = "SCORE: " + score;
-            document.getElementById("level-txt").innerText = "LEVEL: " + level;
-            document.getElementById("coin-display").innerText = "💰 " + userData.coins;
+            document.getElementById("stage-txt").innerText = "STAGE: " + stage;
+            document.getElementById("coin-display").innerText = "💰 " + Math.floor(userData.coins);
         }
 
         function gameOver() {
@@ -249,30 +283,16 @@
             document.getElementById("menuScreen").style.display = "flex";
             updateMenuUI();
             
-            // 5回に1回、大広告を表示
             if(gameOverCount % 5 === 0) {
                 const overlay = document.getElementById("large-ad-overlay");
                 const btn = document.getElementById("close-ad-btn");
                 overlay.style.display = "flex";
-                btn.style.display = "none"; // 最初は隠す
-                
-                // 3.5秒(3500ms)後に×ボタンを表示
-                setTimeout(() => {
-                    btn.style.display = "block";
-                }, 3500);
+                btn.style.display = "none";
+                setTimeout(() => { btn.style.display = "block"; }, 3500);
             }
         }
 
-        function closeLargeAd() {
-            document.getElementById("large-ad-overlay").style.display = "none";
-        }
-
-        function refreshAds() {
-            const t = new Date().getTime();
-            document.getElementById('frame-top').src = "ad.html?t="+t;
-            document.getElementById('frame-bottom').src = "ad.html?t="+t;
-        }
-        setInterval(refreshAds, 30000);
+        function closeLargeAd() { document.getElementById("large-ad-overlay").style.display = "none"; }
         window.onload = loadData;
     </script>
 </body>
