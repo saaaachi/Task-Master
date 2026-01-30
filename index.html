@@ -3,28 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Task Master - 第43弾</title>
+    <title>Task Master - Deluxe</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
-        
+        body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; transition: background 0.3s; }
+        /* フィーバー中の背景 */
+        body.fever-bg { background: #fef3c7; }
+
         #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; }
         #ad-top { top: 0; } #ad-bottom { bottom: 0; }
 
         #large-ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         #close-ad-btn { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; align-self: flex-end; margin-right: 20px; display: none; }
 
-        #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
-        #stat-bar { height: 40px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 12px; }
+        #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; transition: background 0.3s; }
+        #game-outer.fever-mode { background: linear-gradient(to bottom, #fffbeb, #fef3c7); }
+
+        #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
+        #fever-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #334155; }
+        #fever-bar { width: 0%; height: 100%; background: #facc15; transition: width 0.2s; box-shadow: 0 0 8px #facc15; }
+
+        #customer-area { flex-grow: 1; padding: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; overflow-y: auto; justify-content: center; }
         
-        /* お客さんエリア：間隔を詰め、サイズを最大化 */
-        #customer-area { flex-grow: 1; padding: 5px; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; overflow-y: auto; background: #f8fafc; justify-content: center; }
-        .customer { width: 115px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; animation: pop 0.2s ease-out; }
-        .patience-bar { width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; margin-top: 5px; overflow: hidden; }
+        .customer { width: 110px; height: 135px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; position: relative; transition: transform 0.2s; }
+        /* ビジネスマンのスタイル */
+        .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
+        .customer.businessman::after { content: "SPECIAL"; position: absolute; top: -10px; background: #3b82f6; color: white; font-size: 8px; padding: 2px 5px; border-radius: 4px; font-weight: bold; }
+
+        .order-container { display: flex; gap: 4px; height: 45px; justify-content: center; align-items: center; }
+        .order-slot { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 28px; background: #f1f5f9; border-radius: 6px; }
+        .order-slot.done { opacity: 0; }
+
+        .patience-bar { width: 90%; height: 10px; background: #e2e8f0; border-radius: 5px; margin-top: auto; margin-bottom: 5px; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
         #action-panel { height: 110px; background: #fff; border-top: 2px solid #e2e8f0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; padding: 5px; }
-        .task-btn { width: 52px; height: 52px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 22px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px #cbd5e1; }
+        .task-btn { width: 50px; height: 50px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 22px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px #cbd5e1; }
 
         #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 5px; color: white; overflow-y: auto; }
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 10px; margin: 5px 0; border: 1px solid #475569; }
@@ -38,9 +52,6 @@
         .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 8px; margin-top: 10px; padding-bottom: 25px; }
         .menu-btn { width: 280px; padding: 12px; font-size: 16px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
         #start-btn { background: #22c55e; color: white; }
-        #more-games-btn { background: #3b82f6; color: white; }
-
-        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -57,41 +68,27 @@
             <span id="score-txt">SCORE: 0</span>
             <span id="stage-txt">STAGE: 1</span>
             <span id="coin-display" style="color:#facc15">💰 0</span>
+            <div id="fever-container"><div id="fever-bar"></div></div>
         </div>
         <div id="customer-area"></div>
         <div id="action-panel"></div>
 
         <div id="menuScreen">
-            <h2 style="margin:5px 0; color:#22c55e; font-size:20px;">Task Master</h2>
+            <h2 style="margin:5px 0; color:#22c55e; font-size:20px;">Task Master Deluxe</h2>
             <div id="coin-total" style="font-size:16px; color:#facc15;">Total 💰: 0</div>
 
             <div class="shop-box">
-                <div class="shop-item">
-                    <span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span>
-                    <button class="buy-btn" id="btn-p" onclick="buy('patience')">💰 <span id="cost-p">500</span></button>
-                </div>
-                <div class="shop-item">
-                    <span>👥 初期客数 (+<span id="up-c-lv">0</span>)</span>
-                    <button class="buy-btn" id="btn-c" onclick="buy('count')">💰 <span id="cost-c">1000</span></button>
-                </div>
-                <div class="shop-item">
-                    <span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span>
-                    <button class="buy-btn" id="btn-v" onclick="buy('value')">💰 <span id="cost-v">10</span></button>
-                </div>
-                <div class="shop-item" id="stage-buy-item">
-                    <span>🔓 Stage <span id="next-stage-num">2</span> 解放</span>
-                    <button class="buy-btn" id="btn-s" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button>
-                </div>
+                <div class="shop-item"><span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span><button class="buy-btn" id="btn-p" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
+                <div class="shop-item"><span>👥 初期客数 (+<span id="up-c-lv">0</span>)</span><button class="buy-btn" id="btn-c" onclick="buy('count')">💰 <span id="cost-c">1000</span></button></div>
+                <div class="shop-item"><span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span><button class="buy-btn" id="btn-v" onclick="buy('value')">💰 <span id="cost-v">10</span></button></div>
+                <div class="shop-item"><span>🔓 Stage <span id="next-stage-num">2</span> 解放</span><button class="buy-btn" id="btn-s" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
             </div>
 
-            <div class="start-selector">
-                <div style="font-size:10px; color:#94a3b8; text-align:center; margin-bottom:3px;">開始ステージを選択</div>
-                <select id="start-stage-select"></select>
-            </div>
+            <div class="start-selector"><select id="start-stage-select"></select></div>
 
             <div class="menu-btn-group">
                 <button id="start-btn" class="menu-btn" onclick="startGame()">★ 開店 ★</button>
-                <a href="https://saaaachi.github.io/Neo-Merge/" id="more-games-btn" class="menu-btn">★ 他のゲームはこちら ★</a>
+                <a href="https://saaaachi.github.io/Neo-Merge/" style="background:#3b82f6; color:white;" class="menu-btn">★ 他のゲームはこちら ★</a>
             </div>
         </div>
     </div>
@@ -101,13 +98,12 @@
     <script>
         let score = 0, stage = 1, customers = [], gameActive = false, gameOverCount = 0;
         let userData = { coins: 0, upPatience: 0, upCount: 0, upValue: 0, maxUnlockedStage: 1 };
+        let feverGauge = 0, isFever = false;
         
         const baseItems = ['🍎', '🌽', '🥤'];
         const extraItems = [
-            { stage: 3, icon: '🥐', rate: 1.0 },
-            { stage: 5, icon: '🍩', rate: 1.5 },
-            { stage: 10, icon: '🎂', rate: 1.75 },
-            { stage: 15, icon: '🍺', rate: 2.0 }
+            { stage: 3, icon: '🥐', rate: 1.0 }, { stage: 5, icon: '🍩', rate: 1.5 },
+            { stage: 10, icon: '🎂', rate: 1.75 }, { stage: 15, icon: '🍺', rate: 2.0 }
         ];
 
         const upgradeCosts = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000];
@@ -116,16 +112,11 @@
             const saved = localStorage.getItem('taskMaster_save');
             if(saved) {
                 const parsed = JSON.parse(saved);
-                userData.coins = Number(parsed.coins) || 0;
-                userData.upPatience = Number(parsed.upPatience) || 0;
-                userData.upCount = Number(parsed.upCount) || 0;
-                userData.upValue = Number(parsed.upValue) || 0;
-                userData.maxUnlockedStage = Number(parsed.maxUnlockedStage) || 1;
+                userData = {...userData, ...parsed};
             }
             updateMenuUI();
         }
         function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
-
         function getBasePrice() { return Math.floor(10 + (userData.upValue * 2.35)); }
 
         function updateMenuUI() {
@@ -133,105 +124,83 @@
             document.getElementById("up-p-lv").innerText = userData.upPatience;
             document.getElementById("up-c-lv").innerText = userData.upCount;
             document.getElementById("up-v-lv").innerText = userData.upValue;
-            
-            const costP = (userData.upPatience + 1) * 500;
-            const costC = (userData.upCount + 1) * 1000;
-            const costV = upgradeCosts[Math.min(userData.upValue, upgradeCosts.length - 1)];
-            const costS = userData.maxUnlockedStage * 1000; // 1000, 2000, 3000...
-
-            document.getElementById("cost-p").innerText = costP;
-            document.getElementById("cost-c").innerText = costC;
-            document.getElementById("cost-v").innerText = costV;
-            document.getElementById("cost-s").innerText = costS;
+            document.getElementById("cost-p").innerText = (userData.upPatience + 1) * 500;
+            document.getElementById("cost-c").innerText = (userData.upCount + 1) * 1000;
+            document.getElementById("cost-v").innerText = upgradeCosts[Math.min(userData.upValue, upgradeCosts.length-1)];
+            document.getElementById("cost-s").innerText = userData.maxUnlockedStage * 1000;
             document.getElementById("next-stage-num").innerText = userData.maxUnlockedStage + 1;
-
-            document.getElementById("btn-p").disabled = userData.coins < costP;
-            document.getElementById("btn-c").disabled = userData.coins < costC;
-            document.getElementById("btn-v").disabled = userData.coins < costV;
-            document.getElementById("btn-s").disabled = userData.coins < costS;
-
-            // ステージ選択肢の更新
+            document.getElementById("btn-p").disabled = userData.coins < (userData.upPatience + 1) * 500;
+            document.getElementById("btn-c").disabled = userData.coins < (userData.upCount + 1) * 1000;
+            document.getElementById("btn-v").disabled = userData.coins < upgradeCosts[Math.min(userData.upValue, upgradeCosts.length-1)];
+            document.getElementById("btn-s").disabled = userData.coins < userData.maxUnlockedStage * 1000;
             const select = document.getElementById("start-stage-select");
-            const currentVal = select.value;
             select.innerHTML = "";
-            for(let i=1; i<=userData.maxUnlockedStage; i++) {
-                const opt = document.createElement("option");
-                opt.value = i;
-                opt.innerText = "Stage " + i + " から開始";
+            for(let i=1; i<=userData.maxUnlockedStage; i++){
+                const opt = document.createElement("option"); opt.value = i; opt.innerText = "Stage " + i + " から開始";
                 select.appendChild(opt);
             }
-            if(currentVal && currentVal <= userData.maxUnlockedStage) select.value = currentVal;
-            else select.value = userData.maxUnlockedStage;
+            select.value = userData.maxUnlockedStage;
         }
 
         function buy(type) {
             let cost = 0;
-            if(type === 'patience') {
-                cost = (userData.upPatience + 1) * 500;
-                if(userData.coins >= cost) { userData.coins -= cost; userData.upPatience++; }
-            } else if(type === 'count') {
-                cost = (userData.upCount + 1) * 1000;
-                if(userData.coins >= cost) { userData.coins -= cost; userData.upCount++; }
-            } else if(type === 'value') {
-                cost = upgradeCosts[Math.min(userData.upValue, upgradeCosts.length - 1)];
-                if(userData.coins >= cost) { userData.coins -= cost; userData.upValue++; }
-            } else if(type === 'stage') {
-                cost = userData.maxUnlockedStage * 1000;
-                if(userData.coins >= cost) { userData.coins -= cost; userData.maxUnlockedStage++; }
+            if(type === 'patience') cost = (userData.upPatience + 1) * 500;
+            else if(type === 'count') cost = (userData.upCount + 1) * 1000;
+            else if(type === 'value') cost = upgradeCosts[Math.min(userData.upValue, upgradeCosts.length-1)];
+            else if(type === 'stage') cost = userData.maxUnlockedStage * 1000;
+            if(userData.coins >= cost) {
+                userData.coins -= cost;
+                if(type === 'patience') userData.upPatience++; else if(type === 'count') userData.upCount++;
+                else if(type === 'value') userData.upValue++; else if(type === 'stage') userData.maxUnlockedStage++;
+                saveData(); updateMenuUI();
             }
-            saveData(); updateMenuUI();
         }
 
         function startGame() {
-            const select = document.getElementById("start-stage-select");
-            stage = Number(select.value) || 1;
-            score = (stage - 1) * 1000;
+            stage = Number(document.getElementById("start-stage-select").value) || 1;
+            score = (stage - 1) * 1000; feverGauge = 0; isFever = false;
             document.getElementById("menuScreen").style.display = "none";
             customers = []; gameActive = true;
             createButtons(); updateUI(); loop(); spawnCustomer();
         }
 
         function createButtons() {
-            const panel = document.getElementById("action-panel");
-            panel.innerHTML = "";
+            const panel = document.getElementById("action-panel"); panel.innerHTML = "";
             let list = [...baseItems];
             extraItems.forEach(item => { if (stage >= item.stage) list.push(item.icon); });
             list.forEach(icon => {
-                const btn = document.createElement("button");
-                btn.className = "task-btn";
-                btn.innerText = icon;
-                btn.onclick = () => provide(icon);
-                panel.appendChild(btn);
+                const btn = document.createElement("button"); btn.className = "task-btn";
+                btn.innerText = icon; btn.onclick = () => provide(icon); panel.appendChild(btn);
             });
         }
 
         function spawnCustomer() {
             if(!gameActive) return;
-            let baseRate = stage >= 3 ? 1200 : 2500;
             const maxCustomers = 2 + userData.upCount + Math.floor(stage / 3);
             if(customers.length < maxCustomers) {
-                let orderCount = (stage >= 3 || (stage >= 2 && score % 1000 >= 500)) ? 2 : 1;
-                let order = [];
+                let isBiz = Math.random() < 0.15; // 15%でビジネスマン
+                let orderCount = isBiz ? 1 : ((stage >= 3 || (stage >= 2 && score % 1000 >= 500)) ? 2 : 1);
                 let pool = [...baseItems];
                 extraItems.forEach(item => { if (stage >= item.stage) pool.push(item.icon); });
+                let order = [];
                 for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
-                customers.push({ id: Date.now(), order, patience: 100 });
+                customers.push({ id: Date.now(), initialOrder: [...order], order: order, patience: 100, isBusinessman: isBiz });
             }
-            setTimeout(spawnCustomer, Math.max(600, baseRate - (stage * 80)));
+            let rate = Math.max(600, (stage >= 3 ? 1200 : 2500) - (stage * 80));
+            setTimeout(spawnCustomer, rate);
         }
 
         function renderCustomers() {
-            const area = document.getElementById("customer-area");
-            area.innerHTML = "";
+            const area = document.getElementById("customer-area"); area.innerHTML = "";
             customers.forEach(c => {
                 const div = document.createElement("div");
-                div.className = "customer";
-                div.innerHTML = `
-                    <div style="font-size:38px;">👤</div>
-                    <div style="font-size:34px; margin:2px 0;">${c.order[0] || '✅'}</div>
-                    <div style="font-size:10px; color:#64748b; font-weight:bold;">${c.order.length > 1 ? '次: '+c.order[1] : '最後！'}</div>
-                    <div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${pColor(c.patience)}"></div></div>
-                `;
+                div.className = "customer" + (c.isBusinessman ? " businessman" : "");
+                let orderHtml = '<div class="order-container">';
+                c.initialOrder.forEach((item, idx) => {
+                    const isDone = !c.order.includes(item) && (c.order.length < c.initialOrder.length - idx);
+                    orderHtml += `<div class="order-slot ${isDone ? 'done' : ''}">${item}</div>`;
+                });
+                div.innerHTML = `<div style="font-size:38px; margin-bottom:5px;">${c.isBusinessman ? '💼' : '👤'}</div>${orderHtml+='</div>'}<div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${pColor(c.patience)}"></div></div>`;
                 area.appendChild(div);
             });
         }
@@ -242,13 +211,19 @@
             for(let i=0; i<customers.length; i++) {
                 if(customers[i].order[0] === item) {
                     const icon = customers[i].order.shift();
+                    let multiplier = 1.0;
+                    const spec = extraItems.find(ei => ei.icon === icon);
+                    if(spec) multiplier = spec.rate;
+                    if(customers[i].isBusinessman) multiplier *= 5.0; // ビジネスマンは5倍！
+                    if(isFever) multiplier *= 3.0; // フィーバー中は3倍！
+
+                    userData.coins += (getBasePrice() * multiplier);
                     if(customers[i].order.length === 0) {
-                        score += 100;
-                        let multiplier = 1.0;
-                        const spec = extraItems.find(ei => ei.icon === icon);
-                        if(spec) multiplier = spec.rate;
-                        userData.coins += (getBasePrice() * multiplier);
-                        customers.splice(i, 1);
+                        score += 100; customers.splice(i, 1);
+                        if(!isFever) {
+                            feverGauge += 7; // ゲージアップ
+                            if(feverGauge >= 100) startFever();
+                        }
                         if(score > 0 && score % 1000 === 0) { stage++; createButtons(); }
                     }
                     updateUI(); renderCustomers(); return;
@@ -256,13 +231,34 @@
             }
         }
 
+        function startFever() {
+            isFever = true; feverGauge = 100;
+            document.getElementById("game-outer").classList.add("fever-mode");
+            document.body.classList.add("fever-bg");
+            let timer = setInterval(() => {
+                feverGauge -= 4;
+                if(feverGauge <= 0) {
+                    clearInterval(timer); isFever = false; feverGauge = 0;
+                    document.getElementById("game-outer").classList.remove("fever-mode");
+                    document.body.classList.remove("fever-bg");
+                }
+                document.getElementById("fever-bar").style.width = feverGauge + "%";
+            }, 200);
+        }
+
         function loop() {
             if(!gameActive) return;
-            let decay = 0.2 + (stage * 0.06) - (userData.upPatience * 0.03);
-            customers.forEach(c => {
-                c.patience -= Math.max(0.1, decay);
-                if(c.patience <= 0) gameOver();
+            // フィーバー中は時間が止まる
+            let decayBase = isFever ? 0 : (0.2 + (stage * 0.06) - (userData.upPatience * 0.03));
+            customers.forEach((c, i) => {
+                let d = c.isBusinessman ? decayBase * 2 : decayBase;
+                c.patience -= Math.max(0.1, d);
+                if(c.patience <= 0) {
+                    if(c.isBusinessman) { customers.splice(i, 1); } // ビジネスマンは消えるだけ
+                    else { gameOver(); }
+                }
             });
+            document.getElementById("fever-bar").style.width = feverGauge + "%";
             renderCustomers();
             if(gameActive) requestAnimationFrame(loop);
         }
@@ -274,20 +270,15 @@
         }
 
         function gameOver() {
-            gameActive = false;
-            saveData();
-            gameOverCount++;
+            gameActive = false; saveData(); gameOverCount++;
             document.getElementById("menuScreen").style.display = "flex";
             updateMenuUI();
             if(gameOverCount % 5 === 0) {
                 const overlay = document.getElementById("large-ad-overlay");
-                const btn = document.getElementById("close-ad-btn");
                 overlay.style.display = "flex";
-                btn.style.display = "none";
-                setTimeout(() => { btn.style.display = "block"; }, 3500);
+                setTimeout(() => { document.getElementById("close-ad-btn").style.display = "block"; }, 3500);
             }
         }
-
         function closeLargeAd() { document.getElementById("large-ad-overlay").style.display = "none"; }
         window.onload = loadData;
     </script>
