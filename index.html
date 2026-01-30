@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Task Master - 第43弾</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: 'Helvetica Neue', Arial, sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
+        
+        #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 100; display: flex; align-items: center; justify-content: center; }
+        #ad-top { top: 0; } #ad-bottom { bottom: 0; }
+
+        #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; overflow: hidden; display: flex; flex-direction: column; }
+        
+        #stat-bar { height: 40px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-weight: bold; font-size: 14px; }
+
+        /* お客さんエリア */
+        #customer-area { flex-grow: 1; position: relative; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; overflow-y: auto; }
+        .customer { width: 80px; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 5px; display: flex; flex-direction: column; align-items: center; position: relative; animation: pop 0.3s ease-out; }
+        .patience-bar { width: 100%; height: 5px; background: #eee; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .patience-fill { height: 100%; background: #22c55e; width: 100%; }
+        .order-bubble { font-size: 20px; margin: 5px 0; }
+
+        /* 操作パネル */
+        #action-panel { height: 120px; background: #f8fafc; border-top: 2px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; padding: 0 10px; }
+        .task-btn { width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 24px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #ccc; }
+        .task-btn:active { transform: translateY(3px); box-shadow: none; }
+        .btn-red { background: #ef4444; } .btn-blue { background: #3b82f6; } .btn-green { background: #22c55e; } .btn-yellow { background: #eab308; }
+
+        /* メニュー画面 */
+        #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 50; padding-top: 30px; color: white; }
+        #ad-middle-container { width: 300px; min-height: 125px; margin: 15px 0; display: none; justify-content: center; align-items: center; background: rgba(255,255,255,0.1); }
+        .menu-btn { width: 280px; padding: 15px; font-size: 18px; border: none; border-radius: 35px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 10px; text-decoration: none; display: block; }
+        #start-btn { background: #22c55e; color: white; }
+        #more-games-btn { background: #ff007b; color: white; }
+
+        @keyframes pop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div id="ad-top"><iframe id="frame-top" src="ad.html" style="border:none;width:100%;height:100px;"></iframe></div>
+
+    <div id="game-outer">
+        <div id="stat-bar">
+            <span id="score-txt">SCORE: 0</span>
+            <span id="level-txt">LEVEL: 1</span>
+        </div>
+        
+        <div id="customer-area"></div>
+
+        <div id="action-panel">
+            <button class="task-btn btn-red" onclick="provide('🍎')">🍎</button>
+            <button class="task-btn btn-blue" onclick="provide('💧')">💧</button>
+            <button class="task-btn btn-green" onclick="provide('🌿')">🌿</button>
+            <button class="task-btn btn-yellow" onclick="provide('⭐')">⭐</button>
+        </div>
+
+        <div id="menuScreen">
+            <h2 id="result-msg">Task Master</h2>
+            <p id="guide-txt" style="text-align:center; padding:0 20px; color:#cbd5e1;">お客さんのリクエストと同じボタンを押して納品！<br>待たせすぎると怒って帰っちゃうよ😱</p>
+            
+            <div id="ad-middle-container">
+                <script src="https://adm.shinobi.jp/s/1e6de436ea850948e238e975a93767eb"></script>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button id="start-btn" class="menu-btn" onclick="startGame()">★ 業務開始 ★</button>
+                <a href="https://saaaachi.github.io/Neo-Merge/" id="more-games-btn" class="menu-btn">★ 前のゲーム：Neon Slasher ★</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="ad-bottom"><iframe id="frame-bottom" src="ad.html" style="border:none;width:100%;height:100px;"></iframe></div>
+
+    <script>
+        let score = 0, level = 1, customers = [], gameActive = false;
+        let spawnRate = 3000, patienceSpeed = 0.5;
+        const items = ['🍎', '💧', '🌿', '⭐'];
+
+        function startGame() {
+            document.getElementById("menuScreen").style.display = "none";
+            document.getElementById("ad-middle-container").style.display = "none";
+            score = 0; level = 1; customers = []; gameActive = true;
+            spawnRate = 3000; patienceSpeed = 0.5;
+            updateUI();
+            loop();
+            spawnCustomer();
+        }
+
+        function spawnCustomer() {
+            if(!gameActive) return;
+            const orderCount = Math.min(Math.floor(level / 5) + 1, 3);
+            let order = [];
+            for(let i=0; i<orderCount; i++) order.push(items[Math.floor(Math.random() * items.length)]);
+
+            const customer = {
+                id: Date.now(),
+                order: order,
+                patience: 100,
+                maxPatience: 100
+            };
+            customers.push(customer);
+            renderCustomers();
+            
+            setTimeout(spawnCustomer, Math.max(1000, spawnRate - (level * 100)));
+        }
+
+        function renderCustomers() {
+            const area = document.getElementById("customer-area");
+            area.innerHTML = "";
+            customers.forEach(c => {
+                const div = document.createElement("div");
+                div.className = "customer";
+                div.innerHTML = `
+                    <div style="font-size:30px;">👤</div>
+                    <div class="order-bubble">${c.order[0]}</div>
+                    <div style="font-size:10px; color:#666;">あと${c.order.length}点</div>
+                    <div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${getPatienceColor(c.patience)}"></div></div>
+                `;
+                area.appendChild(div);
+            });
+        }
+
+        function getPatienceColor(p) {
+            if(p > 60) return "#22c55e";
+            if(p > 30) return "#eab308";
+            return "#ef4444";
+        }
+
+        function provide(item) {
+            if(!gameActive || customers.length === 0) return;
+            // 一番長く待っている（配列の先頭）お客さんのリクエストをチェック
+            for(let i=0; i<customers.length; i++) {
+                if(customers[i].order[0] === item) {
+                    customers[i].order.shift();
+                    if(customers[i].order.length === 0) {
+                        score += 100 + (level * 10);
+                        customers.splice(i, 1);
+                        checkLevelUp();
+                    }
+                    renderCustomers();
+                    updateUI();
+                    return;
+                }
+            }
+        }
+
+        function checkLevelUp() {
+            if(score > level * 500) {
+                level++;
+                patienceSpeed += 0.1;
+                updateUI();
+            }
+        }
+
+        function loop() {
+            if(!gameActive) return;
+            customers.forEach((c, index) => {
+                c.patience -= patienceSpeed;
+                if(c.patience <= 0) {
+                    gameOver();
+                }
+            });
+            renderCustomers();
+            if(gameActive) requestAnimationFrame(loop);
+        }
+
+        function updateUI() {
+            document.getElementById("score-txt").innerText = "SCORE: " + score;
+            document.getElementById("level-txt").innerText = "LEVEL: " + level;
+        }
+
+        function gameOver() {
+            gameActive = false;
+            document.getElementById("result-msg").innerHTML = "CLOSED!😱<br>FINAL SCORE: " + score;
+            document.getElementById("guide-txt").style.display = "none";
+            document.getElementById("ad-middle-container").style.display = "flex";
+            document.getElementById("menuScreen").style.display = "flex";
+        }
+
+        function refreshAds() {
+            const t = new Date().getTime();
+            document.getElementById('frame-top').src = "ad.html?t="+t;
+            document.getElementById('frame-bottom').src = "ad.html?t="+t;
+        }
+        setInterval(refreshAds, 30000);
+    </script>
+</body>
+</html>
