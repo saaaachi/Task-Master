@@ -7,7 +7,6 @@
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; transition: background 0.3s; }
-        /* フィーバー中の背景 */
         body.fever-bg { background: #fef3c7; }
 
         #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; }
@@ -24,9 +23,7 @@
         #fever-bar { width: 0%; height: 100%; background: #facc15; transition: width 0.2s; box-shadow: 0 0 8px #facc15; }
 
         #customer-area { flex-grow: 1; padding: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; overflow-y: auto; justify-content: center; }
-        
-        .customer { width: 110px; height: 135px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; position: relative; transition: transform 0.2s; }
-        /* ビジネスマンのスタイル */
+        .customer { width: 110px; height: 135px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; position: relative; }
         .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
         .customer.businessman::after { content: "SPECIAL"; position: absolute; top: -10px; background: #3b82f6; color: white; font-size: 8px; padding: 2px 5px; border-radius: 4px; font-weight: bold; }
 
@@ -37,21 +34,27 @@
         .patience-bar { width: 90%; height: 10px; background: #e2e8f0; border-radius: 5px; margin-top: auto; margin-bottom: 5px; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
-        #action-panel { height: 110px; background: #fff; border-top: 2px solid #e2e8f0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; padding: 5px; }
-        .task-btn { width: 50px; height: 50px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 22px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px #cbd5e1; }
+        /* ボタン配置の固定：グリッド使用 */
+        #action-panel { 
+            height: 125px; background: #fff; border-top: 2px solid #e2e8f0; 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            grid-template-rows: repeat(2, 1fr); 
+            gap: 8px; padding: 10px;
+            justify-items: center; align-items: center;
+        }
+        .task-btn { width: 55px; height: 50px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 24px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px #cbd5e1; }
+        .task-btn:empty { visibility: hidden; pointer-events: none; } /* 空のボタンは隠す */
 
         #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 5px; color: white; overflow-y: auto; }
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 10px; margin: 5px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; font-size: 12px; }
         .buy-btn { background: #facc15; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 11px; color: #000; }
         .buy-btn:disabled { background: #475569; color: #94a3b8; }
-
         .start-selector { width: 280px; padding: 10px; margin-top: 5px; background: #1e293b; border-radius: 15px; border: 1px solid #facc15; }
         #start-stage-select { width: 100%; background: transparent; color: #facc15; border: none; font-weight: bold; font-size: 14px; text-align: center; outline: none; }
-
         .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 8px; margin-top: 10px; padding-bottom: 25px; }
         .menu-btn { width: 280px; padding: 12px; font-size: 16px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
-        #start-btn { background: #22c55e; color: white; }
     </style>
 </head>
 <body>
@@ -65,9 +68,7 @@
 
     <div id="game-outer">
         <div id="stat-bar">
-            <span id="score-txt">SCORE: 0</span>
-            <span id="stage-txt">STAGE: 1</span>
-            <span id="coin-display" style="color:#facc15">💰 0</span>
+            <span id="score-txt">SCORE: 0</span><span id="stage-txt">STAGE: 1</span><span id="coin-display" style="color:#facc15">💰 0</span>
             <div id="fever-container"><div id="fever-bar"></div></div>
         </div>
         <div id="customer-area"></div>
@@ -76,18 +77,15 @@
         <div id="menuScreen">
             <h2 style="margin:5px 0; color:#22c55e; font-size:20px;">Task Master Deluxe</h2>
             <div id="coin-total" style="font-size:16px; color:#facc15;">Total 💰: 0</div>
-
             <div class="shop-box">
                 <div class="shop-item"><span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span><button class="buy-btn" id="btn-p" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
                 <div class="shop-item"><span>👥 初期客数 (+<span id="up-c-lv">0</span>)</span><button class="buy-btn" id="btn-c" onclick="buy('count')">💰 <span id="cost-c">1000</span></button></div>
                 <div class="shop-item"><span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span><button class="buy-btn" id="btn-v" onclick="buy('value')">💰 <span id="cost-v">10</span></button></div>
                 <div class="shop-item"><span>🔓 Stage <span id="next-stage-num">2</span> 解放</span><button class="buy-btn" id="btn-s" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
             </div>
-
             <div class="start-selector"><select id="start-stage-select"></select></div>
-
             <div class="menu-btn-group">
-                <button id="start-btn" class="menu-btn" onclick="startGame()">★ 開店 ★</button>
+                <button id="start-btn" style="background: #22c55e; color:white;" class="menu-btn" onclick="startGame()">★ 開店 ★</button>
                 <a href="https://saaaachi.github.io/Neo-Merge/" style="background:#3b82f6; color:white;" class="menu-btn">★ 他のゲームはこちら ★</a>
             </div>
         </div>
@@ -105,15 +103,11 @@
             { stage: 3, icon: '🥐', rate: 1.0 }, { stage: 5, icon: '🍩', rate: 1.5 },
             { stage: 10, icon: '🎂', rate: 1.75 }, { stage: 15, icon: '🍺', rate: 2.0 }
         ];
-
         const upgradeCosts = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000];
 
         function loadData() {
             const saved = localStorage.getItem('taskMaster_save');
-            if(saved) {
-                const parsed = JSON.parse(saved);
-                userData = {...userData, ...parsed};
-            }
+            if(saved) userData = {...userData, ...JSON.parse(saved)};
             updateMenuUI();
         }
         function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
@@ -168,26 +162,31 @@
             const panel = document.getElementById("action-panel"); panel.innerHTML = "";
             let list = [...baseItems];
             extraItems.forEach(item => { if (stage >= item.stage) list.push(item.icon); });
-            list.forEach(icon => {
-                const btn = document.createElement("button"); btn.className = "task-btn";
-                btn.innerText = icon; btn.onclick = () => provide(icon); panel.appendChild(btn);
-            });
+            // 最大6枠の固定グリッドに合わせてボタンを生成
+            for (let i = 0; i < 6; i++) {
+                const btn = document.createElement("button");
+                btn.className = "task-btn";
+                if (list[i]) {
+                    btn.innerText = list[i];
+                    btn.onclick = () => provide(list[i]);
+                }
+                panel.appendChild(btn);
+            }
         }
 
         function spawnCustomer() {
             if(!gameActive) return;
             const maxCustomers = 2 + userData.upCount + Math.floor(stage / 3);
             if(customers.length < maxCustomers) {
-                let isBiz = Math.random() < 0.15; // 15%でビジネスマン
-                let orderCount = isBiz ? 1 : ((stage >= 3 || (stage >= 2 && score % 1000 >= 500)) ? 2 : 1);
+                let isBiz = Math.random() < 0.15;
                 let pool = [...baseItems];
                 extraItems.forEach(item => { if (stage >= item.stage) pool.push(item.icon); });
+                let orderCount = isBiz ? 1 : ((stage >= 3 || (stage >= 2 && score % 1000 >= 500)) ? 2 : 1);
                 let order = [];
                 for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
                 customers.push({ id: Date.now(), initialOrder: [...order], order: order, patience: 100, isBusinessman: isBiz });
             }
-            let rate = Math.max(600, (stage >= 3 ? 1200 : 2500) - (stage * 80));
-            setTimeout(spawnCustomer, rate);
+            setTimeout(spawnCustomer, Math.max(600, (stage >= 3 ? 1200 : 2500) - (stage * 80)));
         }
 
         function renderCustomers() {
@@ -214,16 +213,12 @@
                     let multiplier = 1.0;
                     const spec = extraItems.find(ei => ei.icon === icon);
                     if(spec) multiplier = spec.rate;
-                    if(customers[i].isBusinessman) multiplier *= 5.0; // ビジネスマンは5倍！
-                    if(isFever) multiplier *= 3.0; // フィーバー中は3倍！
-
+                    if(customers[i].isBusinessman) multiplier *= 5.0;
+                    if(isFever) multiplier *= 3.0;
                     userData.coins += (getBasePrice() * multiplier);
                     if(customers[i].order.length === 0) {
                         score += 100; customers.splice(i, 1);
-                        if(!isFever) {
-                            feverGauge += 7; // ゲージアップ
-                            if(feverGauge >= 100) startFever();
-                        }
+                        if(!isFever) { feverGauge += 7; if(feverGauge >= 100) startFever(); }
                         if(score > 0 && score % 1000 === 0) { stage++; createButtons(); }
                     }
                     updateUI(); renderCustomers(); return;
@@ -248,15 +243,11 @@
 
         function loop() {
             if(!gameActive) return;
-            // フィーバー中は時間が止まる
             let decayBase = isFever ? 0 : (0.2 + (stage * 0.06) - (userData.upPatience * 0.03));
             customers.forEach((c, i) => {
                 let d = c.isBusinessman ? decayBase * 2 : decayBase;
                 c.patience -= Math.max(0.1, d);
-                if(c.patience <= 0) {
-                    if(c.isBusinessman) { customers.splice(i, 1); } // ビジネスマンは消えるだけ
-                    else { gameOver(); }
-                }
+                if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); }
             });
             document.getElementById("fever-bar").style.width = feverGauge + "%";
             renderCustomers();
