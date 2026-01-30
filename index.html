@@ -3,80 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Task Master - Layout Fixed</title>
+    <title>Task Master Deluxe</title>
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
 
-        #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; }
+        /* 広告枠 */
+        #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; color: #555; }
         #ad-top { top: 0; } #ad-bottom { bottom: 0; }
 
         #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
+        
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
-        #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; }
+        #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; transition: width 0.2s; }
 
-        /* 【ここが本番！】お客さんが出るエリアを左寄せに固定 */
+        /* お客さんエリア：左上から固定 */
         #customer-area { 
-            flex-grow: 1; 
-            padding: 10px; 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            align-content: flex-start; /* 上から詰める */
-            justify-content: flex-start; /* ← 中央寄せを廃止！左から詰める */
-            overflow-y: auto; 
-            background: #f8fafc; 
+            flex-grow: 1; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; 
+            align-content: flex-start; justify-content: flex-start; 
+            overflow-y: auto; background: #f8fafc; 
         }
         
-        /* お客さんカードの幅を固定（3列並ぶサイズ感） */
         .customer { 
-            width: calc(33.33% - 10px); 
-            min-width: 105px;
-            height: 135px; 
-            background: #fff; 
-            border: 3px solid #e2e8f0; 
-            border-radius: 12px; 
-            padding: 5px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            width: calc(33.33% - 10px); min-width: 105px; height: 135px; 
+            background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; 
+            padding: 5px; display: flex; flex-direction: column; align-items: center; 
         }
         .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
         
-        .order-container { display: flex; gap: 4px; width: 100%; justify-content: center; margin: 5px 0; }
-        .order-slot { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 24px; background: #f1f5f9; border-radius: 6px; }
+        .order-container { display: flex; gap: 3px; width: 100%; justify-content: center; margin: 5px 0; }
+        .order-slot { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #f1f5f9; border-radius: 6px; }
         .order-slot.done { opacity: 0; }
+
         .patience-bar { width: 90%; height: 7px; background: #e2e8f0; border-radius: 5px; margin-top: auto; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
-        /* 下のボタン：絶対配置を維持 */
+        /* 操作パネル：場所を絶対固定 */
         #action-panel { 
             height: 150px; background: #fff; border-top: 2px solid #e2e8f0; 
             display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; 
-            grid-template-areas: "apple corn soda" "croissant donut cake";
+            grid-template-areas: "apple corn soda" "croissant donut beer";
             gap: 12px; padding: 15px; justify-items: center; align-items: center;
         }
-        .task-btn { width: 80px; height: 55px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; }
+        .task-btn { 
+            width: 80px; height: 55px; border-radius: 10px; border: 1px solid #e2e8f0; 
+            font-size: 28px; background: #f8fafc; display: flex; align-items: center; 
+            justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer;
+        }
+        .task-btn:active { transform: translateY(2px); box-shadow: 0 2px #cbd5e1; }
+        
         #btn-0 { grid-area: apple; } #btn-1 { grid-area: corn; } #btn-2 { grid-area: soda; }
-        #btn-3 { grid-area: croissant; } #btn-4 { grid-area: donut; } #btn-5 { grid-area: cake; }
+        #btn-3 { grid-area: croissant; } #btn-4 { grid-area: donut; } #btn-5 { grid-area: beer; }
         .task-btn.locked { visibility: hidden; pointer-events: none; }
 
+        /* メニュー画面 */
         #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 10px; color: white; overflow-y: auto; }
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
         .buy-btn { background: #facc15; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; color: #000; }
+        .buy-btn:disabled { background: #444; color: #888; }
+        .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; border:none; border-radius:35px; font-weight:bold; margin-bottom:15px; cursor: pointer; }
+        .link-btn { background:#3b82f6; color:white; width:260px; padding:12px; font-size:14px; border:none; border-radius:35px; font-weight:bold; text-decoration:none; text-align:center; }
     </style>
 </head>
 <body>
 
-    <div id="ad-top"><iframe src="ad.html" style="border:none; width:100%; height:100px;"></iframe></div>
+    <div id="ad-top">AD SPACE</div>
 
     <div id="game-outer">
         <div id="stat-bar">
             <span id="score-txt">SCORE: 0</span><span id="stage-txt">STAGE: 1</span><span id="coin-display" style="color:#facc15">💰 0</span>
             <div id="fever-bar"></div>
         </div>
+        
         <div id="customer-area"></div>
+        
         <div id="action-panel">
             <button id="btn-0" class="task-btn locked"></button>
             <button id="btn-1" class="task-btn locked"></button>
@@ -89,26 +90,31 @@
         <div id="menuScreen">
             <h2 style="margin:10px 0; color:#22c55e;">Task Master</h2>
             <div id="coin-total" style="font-size:20px; color:#facc15; margin-bottom:10px;">Total 💰: 0</div>
+            
             <div class="shop-box">
                 <div class="shop-item"><span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span><button id="b-p" class="buy-btn" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
                 <div class="shop-item"><span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span><button id="b-v" class="buy-btn" onclick="buy('value')">💰 <span id="cost-v">10</span></button></div>
                 <div class="shop-item"><span>🔓 次のStage解放</span><button id="b-s" class="buy-btn" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
             </div>
-            <div style="margin: 15px 0;"><select id="start-stage-select" style="padding:12px; border-radius:10px; width:250px; font-weight:bold;"></select></div>
-            <button style="background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; border:none; border-radius:35px; font-weight:bold; margin-bottom:15px;" onclick="startGame()">★ 業務開始 ★</button>
-            <a href="https://saaaachi.github.io/Neo-Merge/" style="background:#3b82f6; color:white; width:260px; padding:12px; font-size:14px; border:none; border-radius:35px; font-weight:bold; text-decoration:none; text-align:center;">★ 他のゲームはこちら ★</a>
+
+            <div style="margin: 15px 0;">
+                <select id="start-stage-select" style="padding:12px; border-radius:10px; width:250px; font-weight:bold;"></select>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">★ 業務開始 ★</button>
+            <a href="https://saaaachi.github.io/Neo-Merge/" class="link-btn">★ 他のゲームはこちら ★</a>
         </div>
     </div>
 
-    <div id="ad-bottom"><iframe src="ad.html" style="border:none; width:100%; height:100px;"></iframe></div>
+    <div id="ad-bottom">AD SPACE</div>
 
     <script>
         let score = 0, stage = 1, customers = [], gameActive = false;
         let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1 };
         let feverGauge = 0, isFever = false;
         
-        const itemMaster = ['🍎', '🌽', '🥤', '🥐', '🍩', '🎂'];
-        const extraRules = [{ icon: '🥐', stage: 3 }, { icon: '🍩', stage: 5 }, { icon: '🎂', stage: 10 }];
+        const itemMaster = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'];
+        const extraRules = [{ icon: '🥐', stage: 3 }, { icon: '🍩', stage: 5 }, { icon: '🍺', stage: 10 }];
 
         function loadData() {
             const saved = localStorage.getItem('taskMaster_save');
@@ -121,10 +127,21 @@
             document.getElementById("coin-total").innerText = "Total 💰: " + Math.floor(userData.coins);
             document.getElementById("up-p-lv").innerText = userData.upPatience;
             document.getElementById("up-v-lv").innerText = userData.upValue;
-            const pCost = (userData.upPatience + 1) * 500, vCost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)], sCost = userData.maxUnlockedStage * 1000;
-            document.getElementById("cost-p").innerText = pCost; document.getElementById("cost-v").innerText = vCost; document.getElementById("cost-s").innerText = sCost;
-            document.getElementById("b-p").disabled = userData.coins < pCost; document.getElementById("b-v").disabled = userData.coins < vCost; document.getElementById("b-s").disabled = userData.coins < sCost;
-            const select = document.getElementById("start-stage-select"); select.innerHTML = "";
+            
+            const pCost = (userData.upPatience + 1) * 500;
+            const vCost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)];
+            const sCost = userData.maxUnlockedStage * 1000;
+
+            document.getElementById("cost-p").innerText = pCost;
+            document.getElementById("cost-v").innerText = vCost;
+            document.getElementById("cost-s").innerText = sCost;
+
+            document.getElementById("b-p").disabled = userData.coins < pCost;
+            document.getElementById("b-v").disabled = userData.coins < vCost;
+            document.getElementById("b-s").disabled = userData.coins < sCost;
+
+            const select = document.getElementById("start-stage-select");
+            select.innerHTML = "";
             for(let i=1; i<=userData.maxUnlockedStage; i++){
                 const opt = document.createElement("option"); opt.value = i; opt.innerText = "Stage " + i + " から開始";
                 select.appendChild(opt);
@@ -133,13 +150,10 @@
         }
 
         function buy(type) {
-            let cost = 0;
-            if(type === 'patience') cost = (userData.upPatience + 1) * 500;
-            else if(type === 'value') cost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)];
-            else if(type === 'stage') cost = userData.maxUnlockedStage * 1000;
+            let cost = (type === 'patience') ? (userData.upPatience + 1) * 500 : (type === 'value') ? [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)] : userData.maxUnlockedStage * 1000;
             if(userData.coins >= cost) {
                 userData.coins -= cost;
-                if(type === 'patience') userData.upPatience++; else if(type === 'value') userData.upValue++; else if(type === 'stage') userData.maxUnlockedStage++;
+                if(type === 'patience') userData.upPatience++; else if(type === 'value') userData.upValue++; else userData.maxUnlockedStage++;
                 saveData(); updateMenuUI();
             }
         }
@@ -155,8 +169,10 @@
             itemMaster.forEach((icon, idx) => {
                 const btn = document.getElementById(`btn-${idx}`);
                 const rule = extraRules.find(r => r.icon === icon);
-                const isUnlocked = !rule || stage >= rule.stage;
-                if (isUnlocked) { btn.innerText = icon; btn.classList.remove("locked"); btn.onclick = () => provide(icon); } else { btn.classList.add("locked"); }
+                if (!rule || stage >= rule.stage) {
+                    btn.innerText = icon; btn.classList.remove("locked");
+                    btn.onclick = () => provide(icon);
+                } else { btn.classList.add("locked"); }
             });
         }
 
@@ -166,7 +182,12 @@
             if(customers.length < maxOnScreen) {
                 let pool = itemMaster.filter(icon => { const rule = extraRules.find(r => r.icon === icon); return !rule || stage >= rule.stage; });
                 let isBiz = Math.random() < 0.15;
-                let orderCount = isBiz ? 1 : (stage >= 3 ? 2 : 1);
+                
+                // 注文数ロジック：Stage12から地獄の3つ注文開始
+                let orderCount = 1;
+                if(stage >= 12) orderCount = 3;
+                else if(stage >= 3) orderCount = 2;
+                
                 let order = [];
                 for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
                 customers.push({ id: Date.now(), initialOrder: [...order], order: order, patience: 100, isBusinessman: isBiz });
@@ -193,13 +214,20 @@
 
         function startFever() {
             isFever = true; feverGauge = 100;
-            let timer = setInterval(() => { feverGauge -= 5; if(feverGauge <= 0) { clearInterval(timer); isFever = false; } document.getElementById("fever-bar").style.width = feverGauge + "%"; }, 200);
+            let timer = setInterval(() => {
+                feverGauge -= 5;
+                if(feverGauge <= 0) { clearInterval(timer); isFever = false; }
+                document.getElementById("fever-bar").style.width = feverGauge + "%";
+            }, 200);
         }
 
         function loop() {
             if(!gameActive) return;
             let decay = isFever ? 0 : (0.25 + (stage * 0.05) - (userData.upPatience * 0.04));
-            customers.forEach((c, i) => { c.patience -= (c.isBusinessman ? decay * 2 : decay); if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); } });
+            customers.forEach((c, i) => {
+                c.patience -= (c.isBusinessman ? decay * 2 : decay);
+                if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); }
+            });
             renderCustomers();
             if(gameActive) requestAnimationFrame(loop);
         }
@@ -219,7 +247,12 @@
             });
         }
 
-        function updateUI() { document.getElementById("score-txt").innerText = "SCORE: " + score; document.getElementById("stage-txt").innerText = "STAGE: " + stage; document.getElementById("coin-display").innerText = "💰 " + Math.floor(userData.coins); }
+        function updateUI() {
+            document.getElementById("score-txt").innerText = "SCORE: " + score;
+            document.getElementById("stage-txt").innerText = "STAGE: " + stage;
+            document.getElementById("coin-display").innerText = "💰 " + Math.floor(userData.coins);
+        }
+
         function gameOver() { gameActive = false; saveData(); updateMenuUI(); document.getElementById("menuScreen").style.display = "flex"; }
         window.onload = loadData;
     </script>
