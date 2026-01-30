@@ -5,35 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Task Master Deluxe</title>
     <style>
+        /* スタイルは変更なし */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
-
-        /* 復活！上下広告枠 */
-        #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; color: #777; font-size: 12px; }
+        #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #ad-top { top: 0; } #ad-bottom { bottom: 0; }
-
         #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
-        
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
         #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; transition: width 0.2s; }
-
         #customer-area { flex-grow: 1; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; justify-content: flex-start; overflow-y: auto; background: #f8fafc; }
-        
         .customer { width: calc(33.33% - 10px); min-width: 105px; height: 135px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; }
         .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
-        
         .order-container { display: flex; gap: 3px; width: 100%; justify-content: center; margin: 5px 0; }
         .order-slot { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #f1f5f9; border-radius: 6px; }
         .order-slot.done { opacity: 0; }
         .patience-bar { width: 90%; height: 7px; background: #e2e8f0; border-radius: 5px; margin-top: auto; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
-
         #action-panel { height: 150px; background: #fff; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; grid-template-areas: "apple corn soda" "croissant donut beer"; gap: 12px; padding: 15px; justify-items: center; align-items: center; }
         .task-btn { width: 80px; height: 55px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
         #btn-0 { grid-area: apple; } #btn-1 { grid-area: corn; } #btn-2 { grid-area: soda; }
         #btn-3 { grid-area: croissant; } #btn-4 { grid-area: donut; } #btn-5 { grid-area: beer; }
         .task-btn.locked { visibility: hidden; pointer-events: none; }
-
         #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 10px; color: white; overflow-y: auto; }
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
@@ -43,7 +35,7 @@
 </head>
 <body>
 
-    <div id="ad-top">AD SPACE (TOP)</div>
+    <div id="ad-top"><iframe src="ad.html" style="border:none; width:100%; height:100px; overflow:hidden;"></iframe></div>
 
     <div id="game-outer">
         <div id="stat-bar">
@@ -73,11 +65,10 @@
         </div>
     </div>
 
-    <div id="ad-bottom">AD SPACE (BOTTOM)</div>
+    <div id="ad-bottom"><iframe src="ad.html" style="border:none; width:100%; height:100px; overflow:hidden;"></iframe></div>
 
     <script>
         let score = 0, stage = 1, customers = [], gameActive = false;
-        // playCountを追加して保存
         let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1, playCount: 0 };
         let feverGauge = 0, isFever = false;
         
@@ -86,7 +77,10 @@
 
         function loadData() {
             const saved = localStorage.getItem('taskMaster_save');
-            if(saved) userData = {...userData, ...JSON.parse(saved)};
+            if(saved) {
+                const parsed = JSON.parse(saved);
+                userData = {...userData, ...parsed};
+            }
             updateMenuUI();
         }
         function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
@@ -123,27 +117,25 @@
         }
 
         function showBigAd() {
-            console.log("大サイズ広告を表示します。プレイ回数:", userData.playCount);
-            // ここに実際のインタースティシャル広告の呼び出しコードを挿入してください
-            // 例: if(typeof adbreak === 'function') { adbreak(); }
-            alert("（広告表示テスト：ここに大サイズ広告が入ります）");
+            // ここで大サイズ広告を表示
+            alert("(広告表示テスト : ここに大サイズ広告が入ります)");
         }
 
         function gameOver() {
             gameActive = false;
-            userData.playCount++; // プレイ回数を増やす
+            userData.playCount++; // 通算プレイ回数をカウントアップ
             
             // 広告ロジック：2回目、その後は5回おき（7, 12, 17...）
             if (userData.playCount === 2 || (userData.playCount > 2 && (userData.playCount - 2) % 5 === 0)) {
                 showBigAd();
             }
             
-            saveData();
+            saveData(); // 回数を保存
             updateMenuUI();
             document.getElementById("menuScreen").style.display = "flex";
         }
 
-        /* --- 以下、ゲームロジック（変更なし） --- */
+        /* --- 以下のロジックは変更なし --- */
         function updateButtons() {
             itemMaster.forEach((icon, idx) => {
                 const btn = document.getElementById(`btn-${idx}`);
