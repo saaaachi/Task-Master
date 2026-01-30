@@ -13,8 +13,8 @@
         .ad-frame { border: none; width: 100%; height: 100px; display: block; }
 
         /* 大広告オーバーレイ */
-        #large-ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #close-ad-btn { background: #fff; color: #000; border: none; padding: 5px 15px; border-radius: 5px; font-weight: bold; margin-bottom: 10px; align-self: flex-end; margin-right: 20px; }
+        #large-ad-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #close-ad-btn { background: #fff; color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; margin-bottom: 15px; align-self: flex-end; margin-right: 20px; display: none; } /* 初期は非表示 */
 
         #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
         #stat-bar { height: 40px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 12px; }
@@ -28,17 +28,17 @@
         .task-btn { width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px; color: white; box-shadow: 0 4px #cbd5e1; }
         .btn-red { background: #ef4444; } .btn-blue { background: #3b82f6; } .btn-green { background: #22c55e; } .btn-yellow { background: #eab308; }
 
-        #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 10px; color: white; overflow-y: auto; }
+        #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 10px; color: white; overflow-y: auto; }
         
         .shop-box { background: rgba(255,255,255,0.1); width: 92%; border-radius: 12px; padding: 8px; margin: 5px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; font-size: 11px; }
-        .buy-btn { background: #facc15; border: none; padding: 3px 6px; border-radius: 5px; font-weight: bold; font-size: 10px; cursor: pointer; min-width: 60px; }
+        .buy-btn { background: #facc15; border: none; padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 10px; cursor: pointer; min-width: 65px; color: #000; }
         .buy-btn:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
 
-        .start-option { width: 260px; padding: 8px; font-size: 12px; margin-top: 5px; background: #334155; border-radius: 10px; text-align: center; cursor: pointer; border: 1px dashed #64748b; }
+        .start-option { width: 260px; padding: 10px; font-size: 12px; margin-top: 6px; background: #334155; border-radius: 10px; text-align: center; cursor: pointer; border: 1px dashed #64748b; color: #e2e8f0; }
 
-        .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 6px; margin-top: 8px; padding-bottom: 20px; }
-        .menu-btn { width: 260px; padding: 10px; font-size: 14px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
+        .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 8px; margin-top: 10px; padding-bottom: 25px; }
+        .menu-btn { width: 260px; padding: 12px; font-size: 15px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
         #start-btn { background: #22c55e; color: white; }
         #more-games-btn { background: #ff4081; color: white; }
 
@@ -49,7 +49,7 @@
 
     <div id="large-ad-overlay">
         <button id="close-ad-btn" onclick="closeLargeAd()">✖ 閉じる</button>
-        <iframe id="frame-large" src="ad_large.html" style="width:300px; height:450px; border:none; background:#fff;"></iframe>
+        <iframe id="frame-large" src="ad_large.html" style="width:300px; height:250px; border:none; background:#fff;"></iframe>
     </div>
 
     <div id="ad-top"><iframe id="frame-top" class="ad-frame" src="ad.html"></iframe></div>
@@ -69,33 +69,33 @@
         </div>
 
         <div id="menuScreen">
-            <h2 id="result-msg" style="margin:2px 0; color:#22c55e; font-size:18px;">Task Master</h2>
-            <div id="coin-total" style="font-size:14px; color:#facc15;">Total 💰: 0</div>
+            <h2 id="result-msg" style="margin:2px 0; color:#22c55e; font-size:20px;">Task Master</h2>
+            <div id="coin-total" style="font-size:16px; color:#facc15;">Total 💰: 0</div>
 
             <div class="shop-box">
                 <div class="shop-item">
                     <span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span>
-                    <button class="buy-btn" onclick="buy('patience')">💰<span id="cost-p">500</span></button>
+                    <button class="buy-btn" id="btn-p" onclick="buy('patience')">💰 <span id="cost-p">500</span></button>
                 </div>
                 <div class="shop-item">
                     <span>👥 初期客数 (Lv.<span id="up-c-lv">0</span>)</span>
-                    <button class="buy-btn" onclick="buy('count')">💰<span id="cost-c">1000</span></button>
+                    <button class="buy-btn" id="btn-c" onclick="buy('count')">💰 <span id="cost-c">1000</span></button>
                 </div>
                 <div class="shop-item">
                     <span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span>
-                    <button class="buy-btn" onclick="buy('value')">💰<span id="cost-v">10</span></button>
+                    <button class="buy-btn" id="btn-v" onclick="buy('value')">💰 <span id="cost-v">10</span></button>
                 </div>
-                <div style="font-size:10px; color:#94a3b8; text-align:center;">現在の単価: 💰<span id="current-val">10</span></div>
+                <div style="font-size:10px; color:#94a3b8; text-align:center;">現在の単価: 💰 <span id="current-val">10</span></div>
             </div>
 
             <div id="skip-options">
-                <div class="start-option" id="skip-lv2" onclick="startAt(2, 1000)">Lv2から開始 (💰1000)</div>
-                <div class="start-option" id="skip-lv3" onclick="startAt(3, 2000)">Lv3から開始 (💰2000)</div>
+                <div class="start-option" id="skip-lv2" onclick="startAt(2, 1000)">Lv2から開始 (💰 1000)</div>
+                <div class="start-option" id="skip-lv3" onclick="startAt(3, 2000)">Lv3から開始 (💰 2000)</div>
             </div>
 
             <div class="menu-btn-group">
-                <button id="start-btn" class="menu-btn" onclick="startGame()">★ 普通に開始 ★</button>
-                <a href="https://saaaachi.github.io/Neo-Merge/" id="more-games-btn" class="menu-btn">★ 他のゲームはこちら ★</a>
+                <button id="start-btn" class="menu-btn" onclick="startGame()">★ 開店 ★</button>
+                <a href="https://saaaachi.github.io/Grow-Planet/" id="more-games-btn" class="menu-btn">★ 他のゲームはこちら ★</a>
             </div>
         </div>
     </div>
@@ -104,14 +104,21 @@
 
     <script>
         let score = 0, level = 1, customers = [], gameActive = false;
-        let gameOverCount = 0; // 大広告用のカウント
+        let gameOverCount = 0;
+        // 初期データを確実に数値(Number)にする
         let userData = { coins: 0, upPatience: 0, upCount: 0, upValue: 0 };
         const items = ['🍎', '💧', '🌿', '⭐'];
         const upgradeCosts = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000];
 
         function loadData() {
             const saved = localStorage.getItem('taskMaster_save');
-            if(saved) userData = JSON.parse(saved);
+            if(saved) {
+                const parsed = JSON.parse(saved);
+                userData.coins = Number(parsed.coins) || 0;
+                userData.upPatience = Number(parsed.upPatience) || 0;
+                userData.upCount = Number(parsed.upCount) || 0;
+                userData.upValue = Number(parsed.upValue) || 0;
+            }
             updateMenuUI();
         }
         function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
@@ -122,15 +129,19 @@
             document.getElementById("up-c-lv").innerText = userData.upCount;
             document.getElementById("up-v-lv").innerText = userData.upValue;
             
-            document.getElementById("cost-p").innerText = (userData.upPatience + 1) * 500;
-            document.getElementById("cost-c").innerText = (userData.upCount + 1) * 1000;
-            
-            // 単価アップグレード費用ロジック
-            let vCost = upgradeCosts[Math.min(userData.upValue, upgradeCosts.length - 1)];
-            document.getElementById("cost-v").innerText = vCost;
+            const costP = (userData.upPatience + 1) * 500;
+            const costC = (userData.upCount + 1) * 1000;
+            const costV = upgradeCosts[Math.min(userData.upValue, upgradeCosts.length - 1)];
+
+            document.getElementById("cost-p").innerText = costP;
+            document.getElementById("cost-c").innerText = costC;
+            document.getElementById("cost-v").innerText = costV;
             document.getElementById("current-val").innerText = 10 + userData.upValue;
 
-            // スキップボタンの有効/無効
+            // ボタン有効無効
+            document.getElementById("btn-p").disabled = userData.coins < costP;
+            document.getElementById("btn-c").disabled = userData.coins < costC;
+            document.getElementById("btn-v").disabled = userData.coins < costV;
             document.getElementById("skip-lv2").style.opacity = userData.coins >= 1000 ? "1" : "0.5";
             document.getElementById("skip-lv3").style.opacity = userData.coins >= 2000 ? "1" : "0.5";
         }
@@ -234,13 +245,21 @@
             gameActive = false;
             saveData();
             gameOverCount++;
-            document.getElementById("result-msg").innerHTML = "閉店！💰" + score;
+            document.getElementById("result-msg").innerHTML = "閉店！💰 " + score;
             document.getElementById("menuScreen").style.display = "flex";
             updateMenuUI();
             
             // 5回に1回、大広告を表示
             if(gameOverCount % 5 === 0) {
-                document.getElementById("large-ad-overlay").style.display = "flex";
+                const overlay = document.getElementById("large-ad-overlay");
+                const btn = document.getElementById("close-ad-btn");
+                overlay.style.display = "flex";
+                btn.style.display = "none"; // 最初は隠す
+                
+                // 3.5秒(3500ms)後に×ボタンを表示
+                setTimeout(() => {
+                    btn.style.display = "block";
+                }, 3500);
             }
         }
 
