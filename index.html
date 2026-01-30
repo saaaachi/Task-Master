@@ -3,47 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Task Master - Order Fixed</title>
+    <title>Task Master - Layout Fixed</title>
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; overflow: hidden; background: #f1f5f9; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
 
-        /* 広告枠 */
         #ad-top, #ad-bottom { position: fixed; left: 0; width: 100%; height: 100px; background: #333; z-index: 200; display: flex; align-items: center; justify-content: center; }
         #ad-top { top: 0; } #ad-bottom { bottom: 0; }
 
         #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
-        
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
-        #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; transition: width 0.2s; }
+        #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; }
 
-        #customer-area { flex-grow: 1; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; overflow-y: auto; justify-content: center; background: #f8fafc; }
-        
-        /* お客さんカード */
-        .customer { width: 110px; height: 135px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; position: relative; }
-        .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
-        
-        /* 【ここを修正！】注文エリアを左寄せに固定 */
-        .order-container { 
+        /* 【ここが本番！】お客さんが出るエリアを左寄せに固定 */
+        #customer-area { 
+            flex-grow: 1; 
+            padding: 10px; 
             display: flex; 
-            gap: 5px; 
-            height: 45px; 
-            width: 100%; 
-            justify-content: flex-start; /* ← 中央寄せをやめて左寄せに！ */
-            padding-left: 10px; /* 少し余白を作って見やすく */
+            flex-wrap: wrap; 
+            gap: 10px; 
+            align-content: flex-start; /* 上から詰める */
+            justify-content: flex-start; /* ← 中央寄せを廃止！左から詰める */
+            overflow-y: auto; 
+            background: #f8fafc; 
+        }
+        
+        /* お客さんカードの幅を固定（3列並ぶサイズ感） */
+        .customer { 
+            width: calc(33.33% - 10px); 
+            min-width: 105px;
+            height: 135px; 
+            background: #fff; 
+            border: 3px solid #e2e8f0; 
+            border-radius: 12px; 
+            padding: 5px; 
+            display: flex; 
+            flex-direction: column; 
             align-items: center; 
         }
-        .order-slot { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 28px; background: #f1f5f9; border-radius: 6px; flex-shrink: 0; }
+        .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
+        
+        .order-container { display: flex; gap: 4px; width: 100%; justify-content: center; margin: 5px 0; }
+        .order-slot { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 24px; background: #f1f5f9; border-radius: 6px; }
         .order-slot.done { opacity: 0; }
-
-        .patience-bar { width: 90%; height: 8px; background: #e2e8f0; border-radius: 5px; margin-top: auto; margin-bottom: 5px; overflow: hidden; }
+        .patience-bar { width: 90%; height: 7px; background: #e2e8f0; border-radius: 5px; margin-top: auto; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
-        /* 下のボタン：こちらも絶対配置を維持 */
+        /* 下のボタン：絶対配置を維持 */
         #action-panel { 
             height: 150px; background: #fff; border-top: 2px solid #e2e8f0; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; 
             grid-template-areas: "apple corn soda" "croissant donut cake";
             gap: 12px; padding: 15px; justify-items: center; align-items: center;
         }
@@ -191,7 +200,7 @@
             if(!gameActive) return;
             let decay = isFever ? 0 : (0.25 + (stage * 0.05) - (userData.upPatience * 0.04));
             customers.forEach((c, i) => { c.patience -= (c.isBusinessman ? decay * 2 : decay); if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); } });
-            renderCustomers(); document.getElementById("fever-bar").style.width = feverGauge + "%";
+            renderCustomers();
             if(gameActive) requestAnimationFrame(loop);
         }
 
