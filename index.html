@@ -34,17 +34,24 @@
         .patience-bar { width: 90%; height: 10px; background: #e2e8f0; border-radius: 5px; margin-top: auto; margin-bottom: 5px; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
-        /* ボタン配置の固定：グリッド使用 */
+        /* ボタン配置の修正：左上・上端に強制固定 */
         #action-panel { 
-            height: 125px; background: #fff; border-top: 2px solid #e2e8f0; 
+            height: 130px; background: #fff; border-top: 2px solid #e2e8f0; 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
             grid-template-rows: repeat(2, 1fr); 
-            gap: 8px; padding: 10px;
-            justify-items: center; align-items: center;
+            gap: 10px; padding: 12px;
+            justify-items: start; /* 左寄せ */
+            align-items: start;   /* 上寄せ */
         }
-        .task-btn { width: 55px; height: 50px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 24px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px #cbd5e1; }
-        .task-btn:empty { visibility: hidden; pointer-events: none; } /* 空のボタンは隠す */
+        .task-btn { 
+            width: 100%; height: 50px; border-radius: 10px; 
+            border: 1px solid #e2e8f0; font-size: 24px; 
+            background: #f8fafc; display: flex; align-items: center; 
+            justify-content: center; box-shadow: 0 3px #cbd5e1;
+            max-width: 80px; /* 横幅が広がりすぎないよう制限 */
+        }
+        .task-btn:empty { visibility: hidden; pointer-events: none; }
 
         #menuScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; z-index: 300; padding-top: 5px; color: white; overflow-y: auto; }
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 10px; margin: 5px 0; border: 1px solid #475569; }
@@ -53,8 +60,6 @@
         .buy-btn:disabled { background: #475569; color: #94a3b8; }
         .start-selector { width: 280px; padding: 10px; margin-top: 5px; background: #1e293b; border-radius: 15px; border: 1px solid #facc15; }
         #start-stage-select { width: 100%; background: transparent; color: #facc15; border: none; font-weight: bold; font-size: 14px; text-align: center; outline: none; }
-        .menu-btn-group { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 8px; margin-top: 10px; padding-bottom: 25px; }
-        .menu-btn { width: 280px; padding: 12px; font-size: 16px; border: none; border-radius: 35px; font-weight: bold; text-decoration: none; text-align: center; display: block; }
     </style>
 </head>
 <body>
@@ -84,9 +89,9 @@
                 <div class="shop-item"><span>🔓 Stage <span id="next-stage-num">2</span> 解放</span><button class="buy-btn" id="btn-s" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
             </div>
             <div class="start-selector"><select id="start-stage-select"></select></div>
-            <div class="menu-btn-group">
-                <button id="start-btn" style="background: #22c55e; color:white;" class="menu-btn" onclick="startGame()">★ 開店 ★</button>
-                <a href="https://saaaachi.github.io/Neo-Merge/" style="background:#3b82f6; color:white;" class="menu-btn">★ 他のゲームはこちら ★</a>
+            <div class="menu-btn-group" style="margin-top:15px; display:flex; flex-direction:column; align-items:center; gap:10px; width:100%;">
+                <button id="start-btn" style="background: #22c55e; color:white; width:280px; padding:12px; font-size:16px; border:none; border-radius:35px; font-weight:bold;" onclick="startGame()">★ 開店 ★</button>
+                <a href="https://saaaachi.github.io/Neo-Merge/" style="background:#3b82f6; color:white; width:280px; padding:12px; font-size:16px; border:none; border-radius:35px; font-weight:bold; text-decoration:none; text-align:center;">★ 他のゲームはこちら ★</a>
             </div>
         </div>
     </div>
@@ -162,14 +167,10 @@
             const panel = document.getElementById("action-panel"); panel.innerHTML = "";
             let list = [...baseItems];
             extraItems.forEach(item => { if (stage >= item.stage) list.push(item.icon); });
-            // 最大6枠の固定グリッドに合わせてボタンを生成
             for (let i = 0; i < 6; i++) {
                 const btn = document.createElement("button");
                 btn.className = "task-btn";
-                if (list[i]) {
-                    btn.innerText = list[i];
-                    btn.onclick = () => provide(list[i]);
-                }
+                if (list[i]) { btn.innerText = list[i]; btn.onclick = () => provide(list[i]); }
                 panel.appendChild(btn);
             }
         }
@@ -237,7 +238,6 @@
                     document.getElementById("game-outer").classList.remove("fever-mode");
                     document.body.classList.remove("fever-bg");
                 }
-                document.getElementById("fever-bar").style.width = feverGauge + "%";
             }, 200);
         }
 
