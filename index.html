@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Task Master Deluxe</title>
     <style>
-        /* 基本スタイルは維持 */
+        /* (スタイル部分は変更なしのため維持) */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
         .ad-container { position: fixed; left: 0; width: 100%; height: 100px; background: #222; z-index: 1000; overflow: hidden; }
@@ -33,13 +33,12 @@
         #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; }
         .result-card { background: #fff; color: #333; width: 85%; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
 
-        /* 大広告画面のiframe対応 */
         #bigAdScreen { background: #000; z-index: 2000; display: none; justify-content: center; }
         .ad-frame-wrapper { width: 90%; height: 80%; background: #000; position: relative; border-radius: 10px; overflow: hidden; }
         .ad-close-btn { 
             position: absolute; top: 10px; right: 10px; color: white; font-size: 30px; 
             font-weight: bold; cursor: pointer; background: rgba(0,0,0,0.5); 
-            width: 40px; height: 40px; border-radius: 50%; display: none; /* 最初は隠す */
+            width: 40px; height: 40px; border-radius: 50%; display: none;
             align-items: center; justify-content: center; z-index: 2100;
         }
 
@@ -53,7 +52,9 @@
 </head>
 <body>
 
-    <div id="ad-top" class="ad-container"><iframe src="ad.html" style="border:none; width:100%; height:100px;"></iframe></div>
+    <div id="ad-top" class="ad-container">
+        <iframe id="ifr-top" src="ad.html?pos=top" style="border:none; width:100%; height:100px;"></iframe>
+    </div>
 
     <div id="game-outer">
         <div id="stat-bar"><span id="score-txt">SCORE: 0</span><span id="stage-txt">STAGE: 1</span><span id="coin-display" style="color:#facc15">💰 0</span><div id="fever-bar"></div></div>
@@ -64,7 +65,7 @@
         </div>
 
         <div id="menuScreen" class="overlay">
-            <h2 style="margin:10px 0; color:#22c55e;">Task Master</h2>
+            <h2 style="margin:10px 0; color:#22c55e;">Task Master Deluxe</h2>
             <div id="coin-total" style="font-size:20px; color:#facc15; margin-bottom:10px;">Total 💰: 0</div>
             <div class="shop-box">
                 <div class="shop-item"><span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span><button id="b-p" class="buy-btn" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
@@ -95,9 +96,21 @@
         </div>
     </div>
 
-    <div id="ad-bottom" class="ad-container"><iframe src="ad.html" style="border:none; width:100%; height:100px;"></iframe></div>
+    <div id="ad-bottom" class="ad-container">
+        <iframe id="ifr-bottom" src="ad.html?pos=bottom" style="border:none; width:100%; height:100px;"></iframe>
+    </div>
 
     <script>
+        // --- 修正箇所：広告リフレッシュタイマー ---
+        setInterval(() => {
+            const topAd = document.getElementById('ifr-top');
+            const bottomAd = document.getElementById('ifr-bottom');
+            const now = Date.now();
+            if(topAd) { topAd.src = ""; topAd.src = 'ad.html?pos=top&t=' + now; }
+            if(bottomAd) { bottomAd.src = ""; bottomAd.src = 'ad.html?pos=bottom&t=' + now; }
+            console.log("広告更新成功");
+        }, 30000);
+
         let score = 0, stage = 1, currentSessionCoins = 0, customers = [], gameActive = false;
         let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1, playCount: 0 };
         let feverGauge = 0, isFever = false;
@@ -131,7 +144,7 @@
 
         function closeResult() {
             document.getElementById("resultScreen").style.display = "none";
-            // 2回目、その後5回おきに大広告
+            // プレイ回数に応じて広告を表示
             if (userData.playCount === 2 || (userData.playCount > 2 && (userData.playCount - 2) % 5 === 0)) {
                 showBigAd();
             } else {
@@ -139,30 +152,30 @@
             }
         }
 
-        // 大広告の表示と3秒タイマー
+        // --- 修正箇所：ファイル名を ad.large.html に統一 ---
         function showBigAd() {
             const screen = document.getElementById("bigAdScreen");
             const closeBtn = document.getElementById("ad-close-btn");
             const frame = document.getElementById("ad-large-frame");
             
-            frame.src = "ad_large.html"; // ここでiframeを読み込み
+            frame.src = "ad.large.html?t=" + Date.now(); 
             screen.style.display = "flex";
-            closeBtn.style.display = "none"; // 最初は隠す
+            closeBtn.style.display = "none";
 
             setTimeout(() => {
-                closeBtn.style.display = "flex"; // 3秒後に出現
-            }, 3000);
+                closeBtn.style.display = "flex"; 
+            }, 5000); // 広告をしっかり見せるため5秒待機
         }
 
         function closeAd() {
             document.getElementById("bigAdScreen").style.display = "none";
-            document.getElementById("ad-large-frame").src = ""; // iframeをクリア
+            document.getElementById("ad-large-frame").src = "";
             showMenu();
         }
 
         function showMenu() { updateMenuUI(); document.getElementById("menuScreen").style.display = "flex"; }
         
-        /* --- 既存の提供・移動・UI更新ロジック --- */
+        /* 以降のゲームロジックは変更なし */
         function buy(type) {
             let cost = (type === 'patience') ? (userData.upPatience + 1) * 500 : (type === 'value') ? [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)] : userData.maxUnlockedStage * 1000;
             if(userData.coins >= cost) { userData.coins -= cost; if(type === 'patience') userData.upPatience++; else if(type === 'value') userData.upValue++; else userData.maxUnlockedStage++; saveData(); updateMenuUI(); }
