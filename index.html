@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Task Master Deluxe</title>
+    <title>Task Master Deluxe - Max Revenue</title>
     <style>
-        /* (スタイル部分は変更なしのため維持) */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
         .ad-container { position: fixed; left: 0; width: 100%; height: 100px; background: #222; z-index: 1000; overflow: hidden; }
@@ -30,10 +29,13 @@
 
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 500; color: white; }
         #menuScreen { background: rgba(0,0,0,0.95); padding-top: 10px; overflow-y: auto; }
-        #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; }
-        .result-card { background: #fff; color: #333; width: 85%; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        
+        /* リザルト画面の収益強化スタイル */
+        #resultScreen { background: rgba(0,0,0,0.9); justify-content: flex-start; padding-top: 20px; display: none; overflow-y: auto; }
+        .result-card { background: #fff; color: #333; width: 90%; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        #mid-ad-box { margin: 15px 0; min-height: 250px; display: flex; justify-content: center; align-items: center; background: #eee; width: 100%; }
 
-        #bigAdScreen { background: #000; z-index: 2000; display: none; justify-content: center; }
+        #bigAdScreen { background: #000; z-index: 2000; display: none; justify-content: center; align-items: center; }
         .ad-frame-wrapper { width: 90%; height: 80%; background: #000; position: relative; border-radius: 10px; overflow: hidden; }
         .ad-close-btn { 
             position: absolute; top: 10px; right: 10px; color: white; font-size: 30px; 
@@ -44,7 +46,9 @@
 
         .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
         .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
-        .close-btn { background: #64748b; color:white; width:200px; padding:12px; font-size:16px; margin-top:20px; }
+        .close-btn { background: #64748b; color:white; width:80%; padding:15px; font-size:18px; margin-top:10px; transition: opacity 0.3s; }
+        .close-btn:disabled { background: #94a3b8; opacity: 0.6; cursor: default; }
+        
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
         .buy-btn { background: #facc15; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; color: #000; }
@@ -79,12 +83,20 @@
 
         <div id="resultScreen" class="overlay">
             <div class="result-card">
-                <h1 style="margin:0; color:#ef4444; font-size:32px;">閉店！</h1>
-                <div style="font-size:20px; margin:20px 0; text-align:left;">
+                <h1 style="margin:0; color:#ef4444; font-size:28px;">閉店！</h1>
+                <div style="font-size:18px; margin:10px 0; text-align:left;">
                     <div style="display:flex; justify-content:space-between;"><span>SCORE:</span><b id="final-score">0</b></div>
-                    <div style="display:flex; justify-content:space-between; color:#f59e0b; margin-top:10px;"><span>獲得賞金:</span><b>💰 <span id="final-coins">0</span></b></div>
+                    <div style="display:flex; justify-content:space-between; color:#f59e0b; margin-top:5px;"><span>獲得賞金:</span><b>💰 <span id="final-coins">0</span></b></div>
                 </div>
-                <button class="ui-btn close-btn" onclick="closeResult()">メニューへ戻る</button>
+
+                <div id="mid-ad-box">
+                    <div id="im-8b988d7b042a42d5b8df6921b628cf00">
+                        <script async src="https://imp-adedge.i-mobile.co.jp/script/v1/spot.js?20220104"></script>
+                        <script>(window.adsbyimobile=window.adsbyimobile||[]).push({pid:84561,mid:590804,asid:1924211,type:"banner",display:"inline",elementid:"im-8b988d7b042a42d5b8df6921b628cf00"})</script>
+                    </div>
+                </div>
+
+                <button id="res-close-btn" class="ui-btn close-btn" onclick="closeResult()" disabled>読み込み中...</button>
             </div>
         </div>
 
@@ -101,14 +113,11 @@
     </div>
 
     <script>
-        // --- 修正箇所：広告リフレッシュタイマー ---
+        // --- 広告30秒リフレッシュ ---
         setInterval(() => {
-            const topAd = document.getElementById('ifr-top');
-            const bottomAd = document.getElementById('ifr-bottom');
             const now = Date.now();
-            if(topAd) { topAd.src = ""; topAd.src = 'ad.html?pos=top&t=' + now; }
-            if(bottomAd) { bottomAd.src = ""; bottomAd.src = 'ad.html?pos=bottom&t=' + now; }
-            console.log("広告更新成功");
+            document.getElementById('ifr-top').src = 'ad.html?pos=top&t=' + now;
+            document.getElementById('ifr-bottom').src = 'ad.html?pos=bottom&t=' + now;
         }, 30000);
 
         let score = 0, stage = 1, currentSessionCoins = 0, customers = [], gameActive = false;
@@ -139,12 +148,23 @@
             saveData();
             document.getElementById("final-score").innerText = score;
             document.getElementById("final-coins").innerText = Math.floor(currentSessionCoins);
+            
+            // ボタンを1.5秒無効化
+            const closeBtn = document.getElementById("res-close-btn");
+            closeBtn.disabled = true;
+            closeBtn.innerText = "お待ちください...";
+            
             document.getElementById("resultScreen").style.display = "flex";
+
+            setTimeout(() => {
+                closeBtn.disabled = false;
+                closeBtn.innerText = "メニューへ戻る";
+            }, 1500);
         }
 
         function closeResult() {
             document.getElementById("resultScreen").style.display = "none";
-            // プレイ回数に応じて広告を表示
+            // プレイ回数に応じた大広告ロジック
             if (userData.playCount === 2 || (userData.playCount > 2 && (userData.playCount - 2) % 5 === 0)) {
                 showBigAd();
             } else {
@@ -152,7 +172,6 @@
             }
         }
 
-        // --- 修正箇所：ファイル名を ad.large.html に統一 ---
         function showBigAd() {
             const screen = document.getElementById("bigAdScreen");
             const closeBtn = document.getElementById("ad-close-btn");
@@ -162,9 +181,7 @@
             screen.style.display = "flex";
             closeBtn.style.display = "none";
 
-            setTimeout(() => {
-                closeBtn.style.display = "flex"; 
-            }, 5000); // 広告をしっかり見せるため5秒待機
+            setTimeout(() => { closeBtn.style.display = "flex"; }, 5000);
         }
 
         function closeAd() {
@@ -175,7 +192,6 @@
 
         function showMenu() { updateMenuUI(); document.getElementById("menuScreen").style.display = "flex"; }
         
-        /* 以降のゲームロジックは変更なし */
         function buy(type) {
             let cost = (type === 'patience') ? (userData.upPatience + 1) * 500 : (type === 'value') ? [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)] : userData.maxUnlockedStage * 1000;
             if(userData.coins >= cost) { userData.coins -= cost; if(type === 'patience') userData.upPatience++; else if(type === 'value') userData.upValue++; else userData.maxUnlockedStage++; saveData(); updateMenuUI(); }
