@@ -113,12 +113,6 @@
     </div>
 
     <script>
-        // --- 広告30秒リフレッシュ ---
-        setInterval(() => {
-            const now = Date.now();
-            document.getElementById('ifr-top').src = 'ad.html?pos=top&t=' + now;
-            document.getElementById('ifr-bottom').src = 'ad.html?pos=bottom&t=' + now;
-        }, 30000);
 
         let score = 0, stage = 1, currentSessionCoins = 0, customers = [], gameActive = false;
         let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1, playCount: 0 };
