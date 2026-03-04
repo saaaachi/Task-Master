@@ -30,10 +30,12 @@
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 500; color: white; }
         #menuScreen { background: rgba(0,0,0,0.95); padding-top: 10px; overflow-y: auto; }
         
-        /* リザルト画面の収益強化スタイル */
-        #resultScreen { background: rgba(0,0,0,0.9); justify-content: flex-start; padding-top: 20px; display: none; overflow-y: auto; }
-        .result-card { background: #fff; color: #333; width: 90%; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        #mid-ad-box { margin: 15px 0; min-height: 250px; display: flex; justify-content: center; align-items: center; background: #eee; width: 100%; }
+        /* リザルト画面の改善（ここを修正！） */
+        #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; overflow-y: auto; }
+        .result-card { background: #fff; color: #333; width: 92%; border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 95%; }
+        
+        /* 広告ボックスを可変に */
+        #mid-ad-box { margin: 10px 0; min-height: 200px; flex-grow: 1; display: flex; justify-content: center; align-items: center; background: #eee; width: 100%; overflow: hidden; }
 
         #bigAdScreen { background: #000; z-index: 2000; display: none; justify-content: center; align-items: center; }
         .ad-frame-wrapper { width: 90%; height: 80%; background: #000; position: relative; border-radius: 10px; overflow: hidden; }
@@ -44,10 +46,11 @@
             align-items: center; justify-content: center; z-index: 2100;
         }
 
-        .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
+        .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
         .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
-        .close-btn { background: #64748b; color:white; width:80%; padding:15px; font-size:18px; margin-top:10px; transition: opacity 0.3s; }
+        .close-btn { background: #3b82f6; color:white; width:100%; padding:14px; font-size:18px; margin-top:10px; transition: opacity 0.3s; }
         .close-btn:disabled { background: #94a3b8; opacity: 0.6; cursor: default; }
+        .sub-btn { background: #64748b; color: white; width: 100%; padding: 12px; font-size: 14px; margin-top: 10px; }
         
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
@@ -78,15 +81,15 @@
             </div>
             <div style="margin: 15px 0;"><select id="start-stage-select" style="padding:12px; border-radius:10px; width:250px; font-weight:bold;"></select></div>
             <button class="ui-btn start-btn" onclick="startGame()">★ 業務開始 ★</button>
-            <a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:14px; font-weight:bold;">★ 他のゲームはこちら ★</a>
+            <a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:14px; font-weight:bold; border-bottom: 1px solid #3b82f6;">★ 他のゲームはこちら ★</a>
         </div>
 
         <div id="resultScreen" class="overlay">
             <div class="result-card">
-                <h1 style="margin:0; color:#ef4444; font-size:28px;">閉店！</h1>
-                <div style="font-size:18px; margin:10px 0; text-align:left;">
+                <h1 style="margin:0; color:#ef4444; font-size:24px;">閉店！</h1>
+                <div style="font-size:16px; margin:5px 0; text-align:left;">
                     <div style="display:flex; justify-content:space-between;"><span>SCORE:</span><b id="final-score">0</b></div>
-                    <div style="display:flex; justify-content:space-between; color:#f59e0b; margin-top:5px;"><span>獲得賞金:</span><b>💰 <span id="final-coins">0</span></b></div>
+                    <div style="display:flex; justify-content:space-between; color:#f59e0b; margin-top:2px;"><span>獲得賞金:</span><b>💰 <span id="final-coins">0</span></b></div>
                 </div>
 
                 <div id="mid-ad-box">
@@ -97,6 +100,7 @@
                 </div>
 
                 <button id="res-close-btn" class="ui-btn close-btn" onclick="closeResult()" disabled>読み込み中...</button>
+                <a href="https://saaaachi.github.io/" class="ui-btn sub-btn">★ 他のゲームを遊ぶ ★</a>
             </div>
         </div>
 
@@ -113,6 +117,7 @@
     </div>
 
     <script>
+        // 以前お伝えした「古い30秒リフレッシュ」はここから削除済みです！
 
         let score = 0, stage = 1, currentSessionCoins = 0, customers = [], gameActive = false;
         let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1, playCount: 0 };
@@ -143,7 +148,6 @@
             document.getElementById("final-score").innerText = score;
             document.getElementById("final-coins").innerText = Math.floor(currentSessionCoins);
             
-            // ボタンを1.5秒無効化
             const closeBtn = document.getElementById("res-close-btn");
             closeBtn.disabled = true;
             closeBtn.innerText = "お待ちください...";
@@ -158,7 +162,6 @@
 
         function closeResult() {
             document.getElementById("resultScreen").style.display = "none";
-            // プレイ回数に応じた大広告ロジック
             if (userData.playCount === 2 || (userData.playCount > 2 && (userData.playCount - 2) % 5 === 0)) {
                 showBigAd();
             } else {
@@ -170,11 +173,9 @@
             const screen = document.getElementById("bigAdScreen");
             const closeBtn = document.getElementById("ad-close-btn");
             const frame = document.getElementById("ad-large-frame");
-            
             frame.src = "ad.large.html?t=" + Date.now(); 
             screen.style.display = "flex";
             closeBtn.style.display = "none";
-
             setTimeout(() => { closeBtn.style.display = "flex"; }, 5000);
         }
 
