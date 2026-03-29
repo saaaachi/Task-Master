@@ -9,12 +9,12 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
         
-        /* 上下広告：100px固定 */
-        .ad-container { position: fixed; left: 0; width: 100%; height: 100px; background: #000; z-index: 1000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-        #ad-top { top: 0; }
-        #ad-bottom { bottom: 0; }
+        /* 上部100px固定広告エリア */
+        #ad-top-container { position: fixed; top: 0; left: 0; width: 100%; height: 100px; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; }
 
-        #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
+        /* ゲーム画面（上から100pxの位置からスタート、下まで全開） */
+        #game-outer { position: absolute; top: 100px; bottom: 0; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
+        
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
         #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; }
         #customer-area { flex-grow: 1; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; justify-content: flex-start; overflow-y: auto; background: #f8fafc; }
@@ -34,23 +34,19 @@
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 500; color: white; }
         #menuScreen { background: rgba(0,0,0,0.95); padding-top: 10px; overflow-y: auto; }
         
-        /* リザルト画面：広告なしの時はギュッと寄せる */
+        /* リザルト画面 */
         #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; z-index: 5000; }
-        .result-card { background: #fff; color: #333; width: 92%; border-radius: 20px; padding: 25px 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .result-card { background: #fff; color: #333; width: 92%; border-radius: 20px; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        /* リザルト画面のスクエア枠（デフォルト非表示） */
-        #mid-ad-box { display: none; width: 330px; height: 330px; background: #000; justify-content: center; align-items: center; border-radius: 10px; overflow: hidden; margin: 5px 0; }
-
-        /* 全画面広告（カウントダウン） */
+        .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
+        .close-btn { background: #3b82f6; color:white; width:90%; padding:15px; font-size:20px; }
+        
+        /* 全画面広告（5秒カウント） */
         #inter-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; }
         .inter-content { width: 330px; height: 330px; background: #fff; position: relative; border-radius: 8px; }
         #close-ad-btn { position: absolute; top: -55px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
 
-        .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
-        .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
-        .close-btn { background: #3b82f6; color:white; width:90%; padding:15px; font-size:20px; }
-        .sub-btn { background: #64748b; color: white; width: 90%; padding: 12px; font-size: 14px; }
-        
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
         .buy-btn { background: #facc15; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; color: #000; }
@@ -58,8 +54,11 @@
 </head>
 <body>
 
-    <div id="ad-top" class="ad-container">
-        <ins class="adsbygoogle" style="display:inline-block;width:320px;height:100px" data-ad-client="ca-pub-1299640300068792" data-ad-slot="3972022911"></ins>
+    <div id="ad-top-container">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:728px;height:100px"
+             data-ad-client="ca-pub-1299640300068792"
+             data-ad-slot="3972022911"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
@@ -91,7 +90,6 @@
                     <div>SCORE: <b id="final-score">0</b></div>
                     <div style="color:#f59e0b; margin-top:5px;">獲得賞金: <b>💰 <span id="final-coins">0</span></b></div>
                 </div>
-                <div id="mid-ad-box"></div>
                 <button id="res-close-btn" class="ui-btn close-btn" onclick="closeResult()">OK</button>
                 <a href="https://saaaachi.github.io/" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight:bold;">他のゲームを遊ぶ</a>
             </div>
@@ -103,11 +101,6 @@
                 <iframe id="ifr-inter" src="about:blank" style="width:100%; height:100%; border:none; border-radius:8px; background: #fff;"></iframe>
             </div>
         </div>
-    </div>
-
-    <div id="ad-bottom" class="ad-container">
-        <ins class="adsbygoogle" style="display:inline-block;width:320px;height:100px" data-ad-client="ca-pub-1299640300068792" data-ad-slot="3972022911"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <script>
@@ -129,9 +122,7 @@
         }
 
         function gameOver() {
-            gameActive = false;
-            userData.playCount++;
-            saveData();
+            gameActive = false; userData.playCount++; saveData();
             document.getElementById("final-score").innerText = score;
             document.getElementById("final-coins").innerText = Math.floor(currentSessionCoins);
             document.getElementById("resultScreen").style.display = "flex";
@@ -139,8 +130,8 @@
 
         function closeResult() {
             const count = userData.playCount;
-            // 2回目、その後5回おきのタイミングで広告
-            if (count === 2 || (count > 2 && (count - 2) % 5 === 0)) {
+            // 2回目、5回目、8回目...
+            if (count === 2 || (count > 2 && (count - 2) % 3 === 0)) {
                 showBigAd();
             } else {
                 document.getElementById("resultScreen").style.display = "none";
