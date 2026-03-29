@@ -3,82 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Task Master Deluxe</title>
+    <title>Task Master Deluxe - Max Revenue</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792" crossorigin="anonymous"></script>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body { background: #0f172a; font-family: sans-serif; overflow: hidden; color: white; position: fixed; width: 100%; height: 100%; }
         
-        /* 【修正】広告コンテナ：画面幅いっぱいにしつつ、中身がはみ出ないよう調整 */
-        #ad-top-container { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100px; 
-            background: #000; 
-            z-index: 9999; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            overflow: hidden; /* はみ出し防止 */
-        }
+        /* 上部広告：100px固定・中央寄せ */
+        #ad-top-container { position: fixed; top: 0; left: 0; width: 100%; height: 100px; background: #000; z-index: 9999; overflow: hidden; display: flex; justify-content: center; align-items: center; }
 
-        /* ゲーム本体：広告の100px下から開始 */
-        #game-outer { position: absolute; top: 100px; bottom: 0; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
+        /* ゲーム画面エリア */
+        #game-outer { position: absolute; top: 100px; bottom: 0; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; color: #333; }
         
-        /* ステータスバー */
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
         #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; }
         
-        /* 客エリア：スクロール可能に */
         #customer-area { flex-grow: 1; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; justify-content: flex-start; overflow-y: auto; background: #f8fafc; }
         .customer { width: calc(33.33% - 10px); min-width: 100px; height: 130px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; }
         .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
+        
         .order-container { display: flex; gap: 3px; width: 100%; justify-content: center; margin: 5px 0; }
         .order-slot { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #f1f5f9; border-radius: 6px; }
         .order-slot.done { opacity: 0; }
         .patience-bar { width: 90%; height: 7px; background: #e2e8f0; border-radius: 5px; margin-top: auto; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
 
-        /* 操作パネル */
-        #action-panel { height: 150px; background: #fff; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; grid-template-areas: "apple corn soda" "croissant donut beer"; gap: 10px; padding: 10px; justify-items: center; align-items: center; }
-        .task-btn { width: 85px; height: 60px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
-        #btn-0 { grid-area: apple; } #btn-1 { grid-area: corn; } #btn-2 { grid-area: soda; }
-        #btn-3 { grid-area: croissant; } #btn-4 { grid-area: donut; } #btn-5 { grid-area: beer; }
+        #action-panel { height: 155px; background: #fff; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; padding: 10px; }
+        .task-btn { border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
         .task-btn:active { transform: translateY(2px); box-shadow: 0 2px #cbd5e1; }
-        .task-btn.locked { visibility: hidden; pointer-events: none; }
+        .task-btn.locked { visibility: hidden; }
 
-        /* オーバーレイ共通 */
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 500; color: white; }
-        #menuScreen { background: rgba(0,0,0,0.95); padding-top: 10px; overflow-y: auto; }
-        #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; z-index: 5000; }
-        .result-card { background: #fff; color: #333; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        
-        .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
-        .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
-        .close-btn { background: #3b82f6; color:white; width:90%; padding:15px; font-size:20px; }
-        
-        /* 全画面広告 */
+        /* オーバーレイ (メニュー) */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; align-items: center; padding: 110px 15px 20px; overflow-y: auto; color: white; }
+        .shop-card { width: 100%; background: #1e293b; margin: 4px 0; padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
+        .buy-btn { background: #facc15; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+        #start-btn { margin-top: 15px; width: 100%; min-height: 60px; border-radius: 30px; border: none; background: #22c55e; color: white; font-size: 20px; font-weight: bold; flex-shrink: 0; }
+
+        /* リザルト画面 (SortMaster仕様) */
+        #result-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.98); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: white; }
+        .res-box { background: #1e293b; padding: 25px 15px; border-radius: 20px; border: 2px solid #facc15; width: 95%; max-width: 400px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .ok-btn { padding: 15px; border-radius: 30px; border: none; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; font-size: 18px; width: 85%; }
+        #mid-ad-box { display: none; width: 300px; height: 250px; background: #000; margin: 5px 0; }
+
+        /* 全画面広告（5秒カウント） */
         #inter-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; }
         .inter-content { width: 330px; height: 330px; background: #fff; position: relative; border-radius: 8px; }
-        #close-ad-btn { position: absolute; top: -55px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
-
-        .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
-        .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
-        .buy-btn { background: #facc15; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; color: #000; }
+        #close-ad-btn { position: absolute; top: -50px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div id="ad-top-container">
-        <div style="width: 728px; height: 100px; flex-shrink: 0;">
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:728px;height:100px"
-                 data-ad-client="ca-pub-1299640300068792"
-                 data-ad-slot="3972022911"></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
+        <ins class="adsbygoogle" style="display:inline-block;width:320px;height:100px" data-ad-client="ca-pub-1299640300068792" data-ad-slot="3972022911"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <div id="game-outer">
@@ -88,247 +64,194 @@
             <span id="coin-display" style="color:#facc15">💰 0</span>
             <div id="fever-bar"></div>
         </div>
-        
         <div id="customer-area"></div>
-        
         <div id="action-panel">
-            <button id="btn-0" class="task-btn locked"></button>
-            <button id="btn-1" class="task-btn locked"></button>
-            <button id="btn-2" class="task-btn locked"></button>
-            <button id="btn-3" class="task-btn locked"></button>
-            <button id="btn-4" class="task-btn locked"></button>
-            <button id="btn-5" class="task-btn locked"></button>
+            <button id="btn-0" class="task-btn locked"></button><button id="btn-1" class="task-btn locked"></button><button id="btn-2" class="task-btn locked"></button>
+            <button id="btn-3" class="task-btn locked"></button><button id="btn-4" class="task-btn locked"></button><button id="btn-5" class="task-btn locked"></button>
         </div>
+    </div>
 
-        <div id="menuScreen" class="overlay">
-            <h2 style="margin:10px 0; color:#22c55e;">Task Master Deluxe</h2>
-            <div id="coin-total" style="font-size:20px; color:#facc15; margin-bottom:10px;">Total 💰: 0</div>
-            <div class="shop-box">
-                <div class="shop-item"><span>⏳ 待ち時間 (Lv.<span id="up-p-lv">0</span>)</span><button id="b-p" class="buy-btn" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
-                <div class="shop-item"><span>💎 単価UP (Lv.<span id="up-v-lv">0</span>)</span><button id="b-v" class="buy-btn" onclick="buy('value')">💰 <span id="cost-v">10</span></button></div>
-                <div class="shop-item"><span>🔓 次のStage解放</span><button id="b-s" class="buy-btn" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
-            </div>
-            <div style="margin: 15px 0;"><select id="start-stage-select" style="padding:12px; border-radius:10px; width:250px; font-weight:bold;"></select></div>
-            <button class="ui-btn start-btn" onclick="startGame()">★ 業務開始 ★</button>
-            <a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:15px; font-weight:bold;">★ 他のゲームはこちら ★</a>
+    <div id="menuScreen" class="overlay">
+        <h2 style="color:#facc15; margin-bottom:10px;">Task Master Deluxe</h2>
+        <div style="font-size:22px; margin-bottom:15px;">💰 <span id="shop-coins">0</span></div>
+        <div class="shop-card"><div>⏳ 待ち時間 Lv.<span id="lv-p">0</span></div><button class="buy-btn" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
+        <div class="shop-card"><div>💎 単価UP Lv.<span id="lv-v">0</span></div><button class="buy-btn" onclick="buy('value')">💰 <span id="cost-v">10</span></button></div>
+        <div class="shop-card"><div>🔓 次のStage解放</div><button class="buy-btn" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
+        <div style="margin: 15px 0;"><select id="stage-select" style="padding:12px; border-radius:10px; width:260px;"></select></div>
+        <button id="start-btn" onclick="startGame()">START</button>
+        <div style="margin-top:20px;"><a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:15px; font-weight:bold;">★ 他のゲームはこちら ★</a></div>
+    </div>
+
+    <div id="result-screen">
+        <div class="res-box">
+            <h1 id="res-title" style="color:#ef4444; font-size: 26px;">閉店！</h1>
+            <p style="font-size:20px;">獲得: 💰<span id="res-coins">0</span></p>
+            <div id="mid-ad-box"></div>
+            <button onclick="handleResultOK()" class="ok-btn">OK</button>
+            <a href="https://saaaachi.github.io/" style="color: #3b82f6; text-decoration: none; font-size: 14px;">他のゲームを遊ぶ</a>
         </div>
+    </div>
 
-        <div id="resultScreen" class="overlay">
-            <div class="result-card">
-                <h1 style="margin:0; color:#ef4444; font-size:26px;">閉店！</h1>
-                <div style="font-size:18px; text-align:center;">
-                    <div>SCORE: <b id="final-score">0</b></div>
-                    <div style="color:#f59e0b; margin-top:5px;">獲得賞金: <b>💰 <span id="final-coins">0</span></b></div>
-                </div>
-                <button id="res-close-btn" class="ui-btn close-btn" onclick="closeResult()">OK</button>
-                <a href="https://saaaachi.github.io/" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight:bold;">他のゲームを遊ぶ</a>
-            </div>
-        </div>
-
-        <div id="inter-screen">
-            <div class="inter-content">
-                <div id="close-ad-btn" onclick="closeAd()">5</div>
-                <iframe id="ifr-inter" src="about:blank" style="width:100%; height:100%; border:none; border-radius:8px; background: #fff;"></iframe>
-            </div>
+    <div id="inter-screen">
+        <div class="inter-content">
+            <div id="close-ad-btn" onclick="closeAd()">5</div>
+            <iframe id="ifr-inter" src="about:blank" style="width:100%; height:100%; border:none; border-radius:8px; background: #fff;"></iframe>
         </div>
     </div>
 
     <script>
-        let score = 0, stage = 1, currentSessionCoins = 0, customers = [], gameActive = false;
-        let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1, playCount: 0 };
+        let userData = { coins: 0, upP: 0, upV: 0, maxS: 1, playCount: 0 };
+        let score = 0, stage = 1, sessCoins = 0, customers = [], gameActive = false;
         let feverGauge = 0, isFever = false;
-        const itemMaster = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'];
-        const extraRules = [{ icon: '🥐', stage: 3 }, { icon: '🍩', stage: 5 }, { icon: '🍺', stage: 10 }];
+        const items = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'];
+        const rules = [{ icon: '🥐', s: 3 }, { icon: '🍩', s: 5 }, { icon: '🍺', s: 10 }];
 
-        function loadData() { const saved = localStorage.getItem('taskMaster_save'); if(saved) userData = {...userData, ...JSON.parse(saved)}; updateMenuUI(); }
-        function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
+        function load() { const saved = localStorage.getItem('task_master_vmax'); if(saved) userData = {...userData, ...JSON.parse(saved)}; updateUI(); }
+        function save() { localStorage.setItem('task_master_vmax', JSON.stringify(userData)); }
 
-        function startGame() {
-            stage = Number(document.getElementById("start-stage-select").value) || 1;
-            score = (stage - 1) * 1000; currentSessionCoins = 0; feverGauge = 0; isFever = false;
-            document.getElementById("menuScreen").style.display = "none";
-            document.getElementById("resultScreen").style.display = "none";
-            customers = []; gameActive = true; updateButtons(); updateUI(); loop(); spawnCustomer();
+        function updateUI() {
+            document.getElementById('shop-coins').innerText = Math.floor(userData.coins);
+            document.getElementById('coin-display').innerText = "💰 " + Math.floor(userData.coins);
+            document.getElementById('lv-p').innerText = userData.upP;
+            document.getElementById('lv-v').innerText = userData.upV;
+            document.getElementById('cost-p').innerText = (userData.upP + 1) * 500;
+            document.getElementById('cost-v').innerText = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upV, 8)];
+            document.getElementById('cost-s').innerText = userData.maxS * 1000;
+            const sel = document.getElementById('stage-select'); sel.innerHTML = "";
+            for(let i=1; i<=userData.maxS; i++){ let o = document.createElement("option"); o.value=i; o.innerText=`Stage ${i} から開始`; sel.appendChild(o); }
+            sel.value = userData.maxS;
         }
 
-        function gameOver() {
-            gameActive = false; userData.playCount++; saveData();
-            document.getElementById("final-score").innerText = score;
-            document.getElementById("final-coins").innerText = Math.floor(currentSessionCoins);
-            document.getElementById("resultScreen").style.display = "flex";
-        }
-
-        function closeResult() {
-            const count = userData.playCount;
-            if (count === 2 || (count > 2 && (count - 2) % 3 === 0)) {
-                showBigAd();
-            } else {
-                document.getElementById("resultScreen").style.display = "none";
-                showMenu();
-            }
-        }
-
-        function showBigAd() {
-            const screen = document.getElementById("inter-screen");
-            const closeBtn = document.getElementById("close-ad-btn");
-            const ifr = document.getElementById("ifr-inter");
-            ifr.src = "ad.large.html?v=" + Date.now();
-            screen.style.display = "flex";
-            let timer = 5;
-            closeBtn.innerText = timer;
-            closeBtn.style.pointerEvents = "none";
-            closeBtn.style.background = "#555";
-            const countdown = setInterval(() => {
-                timer--;
-                if (timer > 0) {
-                    closeBtn.innerText = timer;
-                } else {
-                    clearInterval(countdown);
-                    closeBtn.innerText = "×";
-                    closeBtn.style.background = "#ff4444";
-                    closeBtn.style.pointerEvents = "auto";
-                }
-            }, 1000);
-        }
-
-        function closeAd() {
-            document.getElementById("inter-screen").style.display = "none";
-            document.getElementById("resultScreen").style.display = "none";
-            document.getElementById("ifr-inter").src = "about:blank";
-            showMenu();
-        }
-
-        function showMenu() { updateMenuUI(); document.getElementById("menuScreen").style.display = "flex"; }
-        
         function buy(type) {
             let cost = 0;
-            if(type === 'patience') cost = (userData.upPatience + 1) * 500;
-            else if(type === 'value') cost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)];
-            else cost = userData.maxUnlockedStage * 1000;
-
-            if(userData.coins >= cost) {
+            if(type==='patience') cost = (userData.upP + 1) * 500;
+            else if(type==='value') cost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upV, 8)];
+            else cost = userData.maxS * 1000;
+            if(userData.coins >= cost){
                 userData.coins -= cost;
-                if(type === 'patience') userData.upPatience++;
-                else if(type === 'value') userData.upValue++;
-                else userData.maxUnlockedStage++;
-                saveData(); updateMenuUI();
+                if(type==='patience') userData.upP++; else if(type==='value') userData.upV++; else userData.maxS++;
+                save(); updateUI();
             }
         }
 
-        function updateMenuUI() {
-            document.getElementById("coin-total").innerText = "Total 💰: " + Math.floor(userData.coins);
-            document.getElementById("up-p-lv").innerText = userData.upPatience;
-            document.getElementById("up-v-lv").innerText = userData.upValue;
-            const pCost = (userData.upPatience + 1) * 500;
-            const vCost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)];
-            const sCost = userData.maxUnlockedStage * 1000;
-            document.getElementById("cost-p").innerText = pCost;
-            document.getElementById("cost-v").innerText = vCost;
-            document.getElementById("cost-s").innerText = sCost;
-            document.getElementById("b-p").disabled = userData.coins < pCost;
-            document.getElementById("b-v").disabled = userData.coins < vCost;
-            document.getElementById("b-s").disabled = userData.coins < sCost;
-            const select = document.getElementById("start-stage-select");
-            select.innerHTML = "";
-            for(let i=1; i<=userData.maxUnlockedStage; i++){
-                let opt = document.createElement("option"); opt.value = i; opt.innerText = "Stage " + i + " から開始";
-                select.appendChild(opt);
-            }
-            select.value = userData.maxUnlockedStage;
+        function startGame() {
+            stage = Number(document.getElementById('stage-select').value);
+            score = (stage - 1) * 1000; sessCoins = 0; feverGauge = 0; isFever = false;
+            document.getElementById('menuScreen').style.display = 'none';
+            customers = []; gameActive = true; updateButtons(); loop(); spawn();
         }
 
         function updateButtons() {
-            itemMaster.forEach((icon, idx) => {
-                const btn = document.getElementById(`btn-${idx}`);
-                const rule = extraRules.find(r => r.icon === icon);
-                if (!rule || stage >= rule.stage) {
-                    btn.innerText = icon; btn.classList.remove("locked");
-                    btn.onclick = () => provide(icon);
-                } else { btn.classList.add("locked"); }
+            items.forEach((icon, i) => {
+                const btn = document.getElementById(`btn-${i}`);
+                const r = rules.find(x => x.icon === icon);
+                if(!r || stage >= r.s) { btn.innerText = icon; btn.classList.remove("locked"); btn.onclick = () => provide(icon); }
+                else { btn.classList.add("locked"); }
             });
         }
 
-        function spawnCustomer() {
+        function spawn() {
             if(!gameActive) return;
-            const maxOnScreen = 2 + Math.floor(stage / 3);
-            if(customers.length < maxOnScreen) {
-                let pool = itemMaster.filter(icon => {
-                    const rule = extraRules.find(r => r.icon === icon);
-                    return !rule || stage >= rule.stage;
-                });
-                let isBiz = Math.random() < 0.15;
-                let orderCount = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1);
-                let order = [];
-                for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
-                customers.push({ id: Date.now(), initialOrder: [...order], order: order, patience: 100, isBusinessman: isBiz });
+            const max = 2 + Math.floor(stage / 3);
+            if(customers.length < max) {
+                let pool = items.filter(icon => { const r = rules.find(x => x.icon === icon); return !r || stage >= r.s; });
+                let biz = Math.random() < 0.15;
+                let count = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1);
+                let order = []; for(let i=0; i<count; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
+                customers.push({ id: Date.now(), initial: [...order], current: order, p: 100, biz: biz });
             }
-            setTimeout(spawnCustomer, Math.max(800, 2000 - (stage * 100)));
+            setTimeout(spawn, Math.max(800, 2000 - (stage * 100)));
         }
 
         function provide(item) {
             if(!gameActive) return;
             for(let i=0; i<customers.length; i++) {
-                if(customers[i].order[0] === item) {
-                    customers[i].order.shift();
-                    let price = (10 + (userData.upValue * 3)) * (isFever ? 3 : 1) * (customers[i].isBusinessman ? 5 : 1);
-                    userData.coins += price;
-                    currentSessionCoins += price;
-                    if(customers[i].order.length === 0) {
+                if(customers[i].current[0] === item) {
+                    customers[i].current.shift();
+                    let price = (10 + (userData.upV * 3)) * (isFever ? 3 : 1) * (customers[i].biz ? 5 : 1);
+                    userData.coins += price; sessCoins += price;
+                    if(customers[i].current.length === 0) {
                         score += 100; customers.splice(i, 1);
-                        if(!isFever) {
-                            feverGauge += 10;
-                            if(feverGauge >= 100) startFever();
-                        }
+                        if(!isFever) { feverGauge += 10; if(feverGauge >= 100) startFever(); }
                         if(score % 1000 === 0) { stage++; updateButtons(); }
                     }
-                    updateUI(); return;
+                    render(); return;
                 }
             }
         }
 
         function startFever() {
             isFever = true; feverGauge = 100;
-            let timer = setInterval(() => {
-                feverGauge -= 5;
-                if(feverGauge <= 0) { clearInterval(timer); isFever = false; }
-                document.getElementById("fever-bar").style.width = feverGauge + "%";
-            }, 200);
+            let t = setInterval(() => { feverGauge -= 5; if(feverGauge <= 0){ clearInterval(t); isFever = false; } document.getElementById('fever-bar').style.width = feverGauge + "%"; }, 200);
         }
 
         function loop() {
             if(!gameActive) return;
-            let decay = isFever ? 0 : (0.25 + (stage * 0.05) - (userData.upPatience * 0.04));
-            customers.forEach((c, i) => {
-                c.patience -= (c.isBusinessman ? decay * 2 : decay);
-                if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); }
-            });
-            renderCustomers();
-            if(gameActive) requestAnimationFrame(loop);
+            let decay = isFever ? 0 : (0.25 + (stage * 0.05) - (userData.upP * 0.04));
+            customers.forEach((c, i) => { c.p -= (c.biz ? decay * 2 : decay); if(c.p <= 0) { if(c.biz) customers.splice(i, 1); else endTask(); } });
+            render(); if(gameActive) requestAnimationFrame(loop);
         }
 
-        function renderCustomers() {
-            const area = document.getElementById("customer-area");
-            area.innerHTML = "";
+        function render() {
+            const area = document.getElementById('customer-area'); area.innerHTML = "";
             customers.forEach(c => {
-                const div = document.createElement("div");
-                div.className = "customer" + (c.isBusinessman ? " businessman" : "");
-                let orderHtml = '<div class="order-container">';
-                c.initialOrder.forEach((item, idx) => {
-                    const isDone = !c.order.includes(item) && (c.order.length < c.initialOrder.length - idx);
-                    orderHtml += `<div class="order-slot ${isDone ? 'done' : ''}">${item}</div>`;
+                const div = document.createElement("div"); div.className = "customer" + (c.biz ? " businessman" : "");
+                let oHtml = '<div class="order-container">';
+                c.initial.forEach((item, idx) => {
+                    const done = !c.current.includes(item) && (c.current.length < c.initial.length - idx);
+                    oHtml += `<div class="order-slot ${done ? 'done' : ''}">${item}</div>`;
                 });
-                div.innerHTML = `<div style="font-size:38px;">${c.isBusinessman?'💼':'👤'}</div>${orderHtml}</div><div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${c.patience>30?'#22c55e':'#ef4444'}"></div></div>`;
+                div.innerHTML = `<div style="font-size:38px;">${c.biz?'💼':'👤'}</div>${oHtml}</div><div class="patience-bar"><div class="patience-fill" style="width:${c.p}%; background:${c.p>30?'#22c55e':'#ef4444'}"></div></div>`;
                 area.appendChild(div);
             });
+            document.getElementById('score-txt').innerText = "SCORE: " + score;
+            document.getElementById('stage-txt').innerText = "STAGE: " + stage;
+            document.getElementById('coin-display').innerText = "💰 " + Math.floor(userData.coins);
         }
 
-        function updateUI() {
-            document.getElementById("score-txt").innerText = "SCORE: " + score;
-            document.getElementById("stage-txt").innerText = "STAGE: " + stage;
-            document.getElementById("coin-display").innerText = "💰 " + Math.floor(userData.coins);
+        function endTask() {
+            gameActive = false; userData.playCount++; save();
+            document.getElementById('res-coins').innerText = Math.floor(sessCoins);
+            document.getElementById('result-screen').style.display = 'flex';
         }
 
-        window.onload = loadData;
+        function handleResultOK() {
+            const count = userData.playCount;
+            if (count === 2 || (count >= 5 && (count - 2) % 3 === 0)) {
+                showLargeAd();
+            } else {
+                document.getElementById('result-screen').style.display = 'none';
+                document.getElementById('menuScreen').style.display = 'flex';
+                updateUI();
+            }
+        }
+
+        function showLargeAd() {
+            const screen = document.getElementById('inter-screen');
+            const closeBtn = document.getElementById('close-ad-btn');
+            const ifr = document.getElementById('ifr-inter');
+            ifr.src = 'ad.large.html?v=' + Date.now();
+            screen.style.display = 'flex';
+            let timer = 5;
+            closeBtn.innerText = timer;
+            closeBtn.style.pointerEvents = "none";
+            closeBtn.style.background = "#555";
+            const countdown = setInterval(() => {
+                timer--;
+                if (timer > 0) closeBtn.innerText = timer;
+                else { clearInterval(countdown); closeBtn.innerText = "×"; closeBtn.style.background = "#ff4444"; closeBtn.style.pointerEvents = "auto"; }
+            }, 1000);
+        }
+
+        function closeAd() {
+            document.getElementById('inter-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('ifr-inter').src = 'about:blank';
+            document.getElementById('menuScreen').style.display = 'flex';
+            updateUI();
+        }
+
+        window.onload = load;
     </script>
 </body>
 </html>
