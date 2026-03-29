@@ -3,46 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Task Master Deluxe - Max Revenue</title>
+    <title>Task Master Deluxe</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792" crossorigin="anonymous"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
         
-        /* 上部100px固定広告エリア */
-        #ad-top-container { position: fixed; top: 0; left: 0; width: 100%; height: 100px; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        /* 【修正】広告コンテナ：画面幅いっぱいにしつつ、中身がはみ出ないよう調整 */
+        #ad-top-container { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100px; 
+            background: #000; 
+            z-index: 9999; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            overflow: hidden; /* はみ出し防止 */
+        }
 
-        /* ゲーム画面（上から100pxの位置からスタート、下まで全開） */
+        /* ゲーム本体：広告の100px下から開始 */
         #game-outer { position: absolute; top: 100px; bottom: 0; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
         
+        /* ステータスバー */
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
         #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; }
+        
+        /* 客エリア：スクロール可能に */
         #customer-area { flex-grow: 1; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; justify-content: flex-start; overflow-y: auto; background: #f8fafc; }
-        .customer { width: calc(33.33% - 10px); min-width: 105px; height: 135px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; }
+        .customer { width: calc(33.33% - 10px); min-width: 100px; height: 130px; background: #fff; border: 3px solid #e2e8f0; border-radius: 12px; padding: 5px; display: flex; flex-direction: column; align-items: center; }
         .customer.businessman { border-color: #3b82f6; background: #eff6ff; }
         .order-container { display: flex; gap: 3px; width: 100%; justify-content: center; margin: 5px 0; }
-        .order-slot { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #f1f5f9; border-radius: 6px; }
+        .order-slot { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #f1f5f9; border-radius: 6px; }
         .order-slot.done { opacity: 0; }
         .patience-bar { width: 90%; height: 7px; background: #e2e8f0; border-radius: 5px; margin-top: auto; overflow: hidden; }
         .patience-fill { height: 100%; background: #22c55e; }
-        #action-panel { height: 150px; background: #fff; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; grid-template-areas: "apple corn soda" "croissant donut beer"; gap: 12px; padding: 15px; justify-items: center; align-items: center; }
-        .task-btn { width: 80px; height: 55px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
+
+        /* 操作パネル */
+        #action-panel { height: 150px; background: #fff; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; grid-template-areas: "apple corn soda" "croissant donut beer"; gap: 10px; padding: 10px; justify-items: center; align-items: center; }
+        .task-btn { width: 85px; height: 60px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
         #btn-0 { grid-area: apple; } #btn-1 { grid-area: corn; } #btn-2 { grid-area: soda; }
         #btn-3 { grid-area: croissant; } #btn-4 { grid-area: donut; } #btn-5 { grid-area: beer; }
+        .task-btn:active { transform: translateY(2px); box-shadow: 0 2px #cbd5e1; }
         .task-btn.locked { visibility: hidden; pointer-events: none; }
 
+        /* オーバーレイ共通 */
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 500; color: white; }
         #menuScreen { background: rgba(0,0,0,0.95); padding-top: 10px; overflow-y: auto; }
-        
-        /* リザルト画面 */
         #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; z-index: 5000; }
-        .result-card { background: #fff; color: #333; width: 92%; border-radius: 20px; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .result-card { background: #fff; color: #333; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
         .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
         .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
         .close-btn { background: #3b82f6; color:white; width:90%; padding:15px; font-size:20px; }
         
-        /* 全画面広告（5秒カウント） */
+        /* 全画面広告 */
         #inter-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; }
         .inter-content { width: 330px; height: 330px; background: #fff; position: relative; border-radius: 8px; }
         #close-ad-btn { position: absolute; top: -55px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
@@ -55,19 +72,32 @@
 <body>
 
     <div id="ad-top-container">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:728px;height:100px"
-             data-ad-client="ca-pub-1299640300068792"
-             data-ad-slot="3972022911"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        <div style="width: 728px; height: 100px; flex-shrink: 0;">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:728px;height:100px"
+                 data-ad-client="ca-pub-1299640300068792"
+                 data-ad-slot="3972022911"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
     </div>
 
     <div id="game-outer">
-        <div id="stat-bar"><span id="score-txt">SCORE: 0</span><span id="stage-txt">STAGE: 1</span><span id="coin-display" style="color:#facc15">💰 0</span><div id="fever-bar"></div></div>
+        <div id="stat-bar">
+            <span id="score-txt">SCORE: 0</span>
+            <span id="stage-txt">STAGE: 1</span>
+            <span id="coin-display" style="color:#facc15">💰 0</span>
+            <div id="fever-bar"></div>
+        </div>
+        
         <div id="customer-area"></div>
+        
         <div id="action-panel">
-            <button id="btn-0" class="task-btn locked"></button><button id="btn-1" class="task-btn locked"></button><button id="btn-2" class="task-btn locked"></button>
-            <button id="btn-3" class="task-btn locked"></button><button id="btn-4" class="task-btn locked"></button><button id="btn-5" class="task-btn locked"></button>
+            <button id="btn-0" class="task-btn locked"></button>
+            <button id="btn-1" class="task-btn locked"></button>
+            <button id="btn-2" class="task-btn locked"></button>
+            <button id="btn-3" class="task-btn locked"></button>
+            <button id="btn-4" class="task-btn locked"></button>
+            <button id="btn-5" class="task-btn locked"></button>
         </div>
 
         <div id="menuScreen" class="overlay">
@@ -130,7 +160,6 @@
 
         function closeResult() {
             const count = userData.playCount;
-            // 2回目、5回目、8回目...
             if (count === 2 || (count > 2 && (count - 2) % 3 === 0)) {
                 showBigAd();
             } else {
@@ -170,27 +199,135 @@
         }
 
         function showMenu() { updateMenuUI(); document.getElementById("menuScreen").style.display = "flex"; }
+        
         function buy(type) {
-            let cost = (type === 'patience') ? (userData.upPatience + 1) * 500 : (type === 'value') ? [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)] : userData.maxUnlockedStage * 1000;
-            if(userData.coins >= cost) { userData.coins -= cost; if(type === 'patience') userData.upPatience++; else if(type === 'value') userData.upValue++; else userData.maxUnlockedStage++; saveData(); updateMenuUI(); }
+            let cost = 0;
+            if(type === 'patience') cost = (userData.upPatience + 1) * 500;
+            else if(type === 'value') cost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)];
+            else cost = userData.maxUnlockedStage * 1000;
+
+            if(userData.coins >= cost) {
+                userData.coins -= cost;
+                if(type === 'patience') userData.upPatience++;
+                else if(type === 'value') userData.upValue++;
+                else userData.maxUnlockedStage++;
+                saveData(); updateMenuUI();
+            }
         }
+
         function updateMenuUI() {
             document.getElementById("coin-total").innerText = "Total 💰: " + Math.floor(userData.coins);
-            document.getElementById("up-p-lv").innerText = userData.upPatience; document.getElementById("up-v-lv").innerText = userData.upValue;
-            const pCost = (userData.upPatience + 1) * 500, vCost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)], sCost = userData.maxUnlockedStage * 1000;
-            document.getElementById("cost-p").innerText = pCost; document.getElementById("cost-v").innerText = vCost; document.getElementById("cost-s").innerText = sCost;
-            document.getElementById("b-p").disabled = userData.coins < pCost; document.getElementById("b-v").disabled = userData.coins < vCost; document.getElementById("b-s").disabled = userData.coins < sCost;
-            const select = document.getElementById("start-stage-select"); select.innerHTML = "";
-            for(let i=1; i<=userData.maxUnlockedStage; i++){ let opt = document.createElement("option"); opt.value = i; opt.innerText = "Stage " + i + " から開始"; select.appendChild(opt); }
+            document.getElementById("up-p-lv").innerText = userData.upPatience;
+            document.getElementById("up-v-lv").innerText = userData.upValue;
+            const pCost = (userData.upPatience + 1) * 500;
+            const vCost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)];
+            const sCost = userData.maxUnlockedStage * 1000;
+            document.getElementById("cost-p").innerText = pCost;
+            document.getElementById("cost-v").innerText = vCost;
+            document.getElementById("cost-s").innerText = sCost;
+            document.getElementById("b-p").disabled = userData.coins < pCost;
+            document.getElementById("b-v").disabled = userData.coins < vCost;
+            document.getElementById("b-s").disabled = userData.coins < sCost;
+            const select = document.getElementById("start-stage-select");
+            select.innerHTML = "";
+            for(let i=1; i<=userData.maxUnlockedStage; i++){
+                let opt = document.createElement("option"); opt.value = i; opt.innerText = "Stage " + i + " から開始";
+                select.appendChild(opt);
+            }
             select.value = userData.maxUnlockedStage;
         }
-        function updateButtons() { itemMaster.forEach((icon, idx) => { const btn = document.getElementById(`btn-${idx}`); const rule = extraRules.find(r => r.icon === icon); if (!rule || stage >= rule.stage) { btn.innerText = icon; btn.classList.remove("locked"); btn.onclick = () => provide(icon); } else { btn.classList.add("locked"); } }); }
-        function spawnCustomer() { if(!gameActive) return; const maxOnScreen = 2 + Math.floor(stage / 3); if(customers.length < maxOnScreen) { let pool = itemMaster.filter(icon => { const rule = extraRules.find(r => r.icon === icon); return !rule || stage >= rule.stage; }); let isBiz = Math.random() < 0.15, orderCount = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1); let order = []; for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]); customers.push({ id: Date.now(), initialOrder: [...order], order: order, patience: 100, isBusinessman: isBiz }); } setTimeout(spawnCustomer, Math.max(800, 2000 - (stage * 100))); }
-        function provide(item) { if(!gameActive) return; for(let i=0; i<customers.length; i++) { if(customers[i].order[0] === item) { customers[i].order.shift(); let price = (10 + (userData.upValue * 3)) * (isFever ? 3 : 1) * (customers[i].isBusinessman ? 5 : 1); userData.coins += price; currentSessionCoins += price; if(customers[i].order.length === 0) { score += 100; customers.splice(i, 1); if(!isFever) { feverGauge += 10; if(feverGauge >= 100) startFever(); } if(score % 1000 === 0) { stage++; updateButtons(); } } updateUI(); return; } } }
-        function startFever() { isFever = true; feverGauge = 100; let timer = setInterval(() => { feverGauge -= 5; if(feverGauge <= 0) { clearInterval(timer); isFever = false; } document.getElementById("fever-bar").style.width = feverGauge + "%"; }, 200); }
-        function loop() { if(!gameActive) return; let decay = isFever ? 0 : (0.25 + (stage * 0.05) - (userData.upPatience * 0.04)); customers.forEach((c, i) => { c.patience -= (c.isBusinessman ? decay * 2 : decay); if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); } }); renderCustomers(); if(gameActive) requestAnimationFrame(loop); }
-        function renderCustomers() { const area = document.getElementById("customer-area"); area.innerHTML = ""; customers.forEach(c => { const div = document.createElement("div"); div.className = "customer" + (c.isBusinessman ? " businessman" : ""); let orderHtml = '<div class="order-container">'; c.initialOrder.forEach((item, idx) => { const isDone = !c.order.includes(item) && (c.order.length < c.initialOrder.length - idx); orderHtml += `<div class="order-slot ${isDone ? 'done' : ''}">${item}</div>`; }); div.innerHTML = `<div style="font-size:38px;">${c.isBusinessman?'💼':'👤'}</div>${orderHtml}</div><div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${c.patience>30?'#22c55e':'#ef4444'}"></div></div>`; area.appendChild(div); }); }
-        function updateUI() { document.getElementById("score-txt").innerText = "SCORE: " + score; document.getElementById("stage-txt").innerText = "STAGE: " + stage; document.getElementById("coin-display").innerText = "💰 " + Math.floor(userData.coins); }
+
+        function updateButtons() {
+            itemMaster.forEach((icon, idx) => {
+                const btn = document.getElementById(`btn-${idx}`);
+                const rule = extraRules.find(r => r.icon === icon);
+                if (!rule || stage >= rule.stage) {
+                    btn.innerText = icon; btn.classList.remove("locked");
+                    btn.onclick = () => provide(icon);
+                } else { btn.classList.add("locked"); }
+            });
+        }
+
+        function spawnCustomer() {
+            if(!gameActive) return;
+            const maxOnScreen = 2 + Math.floor(stage / 3);
+            if(customers.length < maxOnScreen) {
+                let pool = itemMaster.filter(icon => {
+                    const rule = extraRules.find(r => r.icon === icon);
+                    return !rule || stage >= rule.stage;
+                });
+                let isBiz = Math.random() < 0.15;
+                let orderCount = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1);
+                let order = [];
+                for(let i=0; i<orderCount; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
+                customers.push({ id: Date.now(), initialOrder: [...order], order: order, patience: 100, isBusinessman: isBiz });
+            }
+            setTimeout(spawnCustomer, Math.max(800, 2000 - (stage * 100)));
+        }
+
+        function provide(item) {
+            if(!gameActive) return;
+            for(let i=0; i<customers.length; i++) {
+                if(customers[i].order[0] === item) {
+                    customers[i].order.shift();
+                    let price = (10 + (userData.upValue * 3)) * (isFever ? 3 : 1) * (customers[i].isBusinessman ? 5 : 1);
+                    userData.coins += price;
+                    currentSessionCoins += price;
+                    if(customers[i].order.length === 0) {
+                        score += 100; customers.splice(i, 1);
+                        if(!isFever) {
+                            feverGauge += 10;
+                            if(feverGauge >= 100) startFever();
+                        }
+                        if(score % 1000 === 0) { stage++; updateButtons(); }
+                    }
+                    updateUI(); return;
+                }
+            }
+        }
+
+        function startFever() {
+            isFever = true; feverGauge = 100;
+            let timer = setInterval(() => {
+                feverGauge -= 5;
+                if(feverGauge <= 0) { clearInterval(timer); isFever = false; }
+                document.getElementById("fever-bar").style.width = feverGauge + "%";
+            }, 200);
+        }
+
+        function loop() {
+            if(!gameActive) return;
+            let decay = isFever ? 0 : (0.25 + (stage * 0.05) - (userData.upPatience * 0.04));
+            customers.forEach((c, i) => {
+                c.patience -= (c.isBusinessman ? decay * 2 : decay);
+                if(c.patience <= 0) { if(c.isBusinessman) customers.splice(i, 1); else gameOver(); }
+            });
+            renderCustomers();
+            if(gameActive) requestAnimationFrame(loop);
+        }
+
+        function renderCustomers() {
+            const area = document.getElementById("customer-area");
+            area.innerHTML = "";
+            customers.forEach(c => {
+                const div = document.createElement("div");
+                div.className = "customer" + (c.isBusinessman ? " businessman" : "");
+                let orderHtml = '<div class="order-container">';
+                c.initialOrder.forEach((item, idx) => {
+                    const isDone = !c.order.includes(item) && (c.order.length < c.initialOrder.length - idx);
+                    orderHtml += `<div class="order-slot ${isDone ? 'done' : ''}">${item}</div>`;
+                });
+                div.innerHTML = `<div style="font-size:38px;">${c.isBusinessman?'💼':'👤'}</div>${orderHtml}</div><div class="patience-bar"><div class="patience-fill" style="width:${c.patience}%; background:${c.patience>30?'#22c55e':'#ef4444'}"></div></div>`;
+                area.appendChild(div);
+            });
+        }
+
+        function updateUI() {
+            document.getElementById("score-txt").innerText = "SCORE: " + score;
+            document.getElementById("stage-txt").innerText = "STAGE: " + stage;
+            document.getElementById("coin-display").innerText = "💰 " + Math.floor(userData.coins);
+        }
+
         window.onload = loadData;
     </script>
 </body>
