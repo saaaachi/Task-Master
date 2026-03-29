@@ -39,13 +39,15 @@
         .buy-btn { background: #facc15; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         #start-btn { margin-top: 15px; width: 100%; min-height: 60px; border-radius: 30px; border: none; background: #22c55e; color: white; font-size: 20px; font-weight: bold; flex-shrink: 0; }
 
-        /* リザルト画面 (SortMaster仕様) */
-        #result-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.98); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: white; }
-        .res-box { background: #1e293b; padding: 25px 15px; border-radius: 20px; border: 2px solid #facc15; width: 95%; max-width: 400px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .ok-btn { padding: 15px; border-radius: 30px; border: none; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; font-size: 18px; width: 85%; }
-        #mid-ad-box { display: none; width: 300px; height: 250px; background: #000; margin: 5px 0; }
+        /* リザルト画面 */
+        #result-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.98); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; padding: 10px; color: white; }
+        .res-box { background: #1e293b; padding: 20px 15px; border-radius: 20px; border: 2px solid #facc15; width: 95%; max-width: 380px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .ok-btn { padding: 12px; border-radius: 30px; border: none; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; font-size: 18px; width: 85%; }
+        
+        /* リザルト広告枠：300x250サイズ */
+        #mid-ad-box { width: 300px; height: 250px; background: #000; margin: 5px 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        /* 全画面広告（5秒カウント） */
+        /* 5秒広告スクリーン */
         #inter-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; }
         .inter-content { width: 330px; height: 330px; background: #fff; position: relative; border-radius: 8px; }
         #close-ad-btn { position: absolute; top: -50px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
@@ -77,16 +79,24 @@
         <div class="shop-card"><div>⏳ 待ち時間 Lv.<span id="lv-p">0</span></div><button class="buy-btn" onclick="buy('patience')">💰 <span id="cost-p">500</span></button></div>
         <div class="shop-card"><div>💎 単価UP Lv.<span id="lv-v">0</span></div><button class="buy-btn" onclick="buy('value')">💰 <span id="cost-v">10</span></button></div>
         <div class="shop-card"><div>🔓 次のStage解放</div><button class="buy-btn" onclick="buy('stage')">💰 <span id="cost-s">1000</span></button></div>
-        <div style="margin: 15px 0;"><select id="stage-select" style="padding:12px; border-radius:10px; width:260px;"></select></div>
+        <div style="margin: 15px 0;"><select id="stage-select" style="padding:12px; border-radius:10px; width:260px; font-weight:bold;"></select></div>
         <button id="start-btn" onclick="startGame()">START</button>
         <div style="margin-top:20px;"><a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:15px; font-weight:bold;">★ 他のゲームはこちら ★</a></div>
     </div>
 
     <div id="result-screen">
         <div class="res-box">
-            <h1 id="res-title" style="color:#ef4444; font-size: 26px;">閉店！</h1>
-            <p style="font-size:20px;">獲得: 💰<span id="res-coins">0</span></p>
-            <div id="mid-ad-box"></div>
+            <h1 id="res-title" style="color:#ef4444; font-size: 24px;">閉店！</h1>
+            <p style="font-size:18px;">獲得: 💰<span id="res-coins">0</span></p>
+            
+            <div id="mid-ad-box">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:300px;height:250px"
+                     data-ad-client="ca-pub-1299640300068792"
+                     data-ad-slot="9050127185"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+
             <button onclick="handleResultOK()" class="ok-btn">OK</button>
             <a href="https://saaaachi.github.io/" style="color: #3b82f6; text-decoration: none; font-size: 14px;">他のゲームを遊ぶ</a>
         </div>
@@ -101,10 +111,8 @@
 
     <script>
         let userData = { coins: 0, upP: 0, upV: 0, maxS: 1, playCount: 0 };
-        let score = 0, stage = 1, sessCoins = 0, customers = [], gameActive = false;
-        let feverGauge = 0, isFever = false;
-        const items = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'];
-        const rules = [{ icon: '🥐', s: 3 }, { icon: '🍩', s: 5 }, { icon: '🍺', s: 10 }];
+        let score = 0, stage = 1, sessCoins = 0, customers = [], gameActive = false, feverGauge = 0, isFever = false;
+        const items = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'], rules = [{ icon: '🥐', s: 3 }, { icon: '🍩', s: 5 }, { icon: '🍺', s: 10 }];
 
         function load() { const saved = localStorage.getItem('task_master_vmax'); if(saved) userData = {...userData, ...JSON.parse(saved)}; updateUI(); }
         function save() { localStorage.setItem('task_master_vmax', JSON.stringify(userData)); }
@@ -127,11 +135,7 @@
             if(type==='patience') cost = (userData.upP + 1) * 500;
             else if(type==='value') cost = [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upV, 8)];
             else cost = userData.maxS * 1000;
-            if(userData.coins >= cost){
-                userData.coins -= cost;
-                if(type==='patience') userData.upP++; else if(type==='value') userData.upV++; else userData.maxS++;
-                save(); updateUI();
-            }
+            if(userData.coins >= cost){ userData.coins -= cost; if(type==='patience') userData.upP++; else if(type==='value') userData.upV++; else userData.maxS++; save(); updateUI(); }
         }
 
         function startGame() {
@@ -155,9 +159,8 @@
             const max = 2 + Math.floor(stage / 3);
             if(customers.length < max) {
                 let pool = items.filter(icon => { const r = rules.find(x => x.icon === icon); return !r || stage >= r.s; });
-                let biz = Math.random() < 0.15;
-                let count = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1);
-                let order = []; for(let i=0; i<count; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
+                let biz = Math.random() < 0.15, count = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1), order = [];
+                for(let i=0; i<count; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
                 customers.push({ id: Date.now(), initial: [...order], current: order, p: 100, biz: biz });
             }
             setTimeout(spawn, Math.max(800, 2000 - (stage * 100)));
@@ -180,10 +183,7 @@
             }
         }
 
-        function startFever() {
-            isFever = true; feverGauge = 100;
-            let t = setInterval(() => { feverGauge -= 5; if(feverGauge <= 0){ clearInterval(t); isFever = false; } document.getElementById('fever-bar').style.width = feverGauge + "%"; }, 200);
-        }
+        function startFever() { isFever = true; feverGauge = 100; let t = setInterval(() => { feverGauge -= 5; if(feverGauge <= 0){ clearInterval(t); isFever = false; } document.getElementById('fever-bar').style.width = feverGauge + "%"; }, 200); }
 
         function loop() {
             if(!gameActive) return;
@@ -217,39 +217,18 @@
 
         function handleResultOK() {
             const count = userData.playCount;
-            if (count === 2 || (count >= 5 && (count - 2) % 3 === 0)) {
-                showLargeAd();
-            } else {
-                document.getElementById('result-screen').style.display = 'none';
-                document.getElementById('menuScreen').style.display = 'flex';
-                updateUI();
-            }
+            if (count === 2 || (count >= 5 && (count - 2) % 3 === 0)) showLargeAd();
+            else { document.getElementById('result-screen').style.display = 'none'; document.getElementById('menuScreen').style.display = 'flex'; updateUI(); }
         }
 
         function showLargeAd() {
-            const screen = document.getElementById('inter-screen');
-            const closeBtn = document.getElementById('close-ad-btn');
-            const ifr = document.getElementById('ifr-inter');
-            ifr.src = 'ad.large.html?v=' + Date.now();
-            screen.style.display = 'flex';
-            let timer = 5;
-            closeBtn.innerText = timer;
-            closeBtn.style.pointerEvents = "none";
-            closeBtn.style.background = "#555";
-            const countdown = setInterval(() => {
-                timer--;
-                if (timer > 0) closeBtn.innerText = timer;
-                else { clearInterval(countdown); closeBtn.innerText = "×"; closeBtn.style.background = "#ff4444"; closeBtn.style.pointerEvents = "auto"; }
-            }, 1000);
+            const screen = document.getElementById('inter-screen'), closeBtn = document.getElementById('close-ad-btn'), ifr = document.getElementById('ifr-inter');
+            ifr.src = 'ad.large.html?v=' + Date.now(); screen.style.display = 'flex';
+            let timer = 5; closeBtn.innerText = timer; closeBtn.style.pointerEvents = "none"; closeBtn.style.background = "#555";
+            const countdown = setInterval(() => { timer--; if (timer > 0) closeBtn.innerText = timer; else { clearInterval(countdown); closeBtn.innerText = "×"; closeBtn.style.background = "#ff4444"; closeBtn.style.pointerEvents = "auto"; } }, 1000);
         }
 
-        function closeAd() {
-            document.getElementById('inter-screen').style.display = 'none';
-            document.getElementById('result-screen').style.display = 'none';
-            document.getElementById('ifr-inter').src = 'about:blank';
-            document.getElementById('menuScreen').style.display = 'flex';
-            updateUI();
-        }
+        function closeAd() { document.getElementById('inter-screen').style.display = 'none'; document.getElementById('result-screen').style.display = 'none'; document.getElementById('ifr-inter').src = 'about:blank'; document.getElementById('menuScreen').style.display = 'flex'; updateUI(); }
 
         window.onload = load;
     </script>
