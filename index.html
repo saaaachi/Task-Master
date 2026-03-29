@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Task Master Deluxe - Max Revenue</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792" crossorigin="anonymous"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; position: fixed; width: 100%; height: 100%; }
-        .ad-container { position: fixed; left: 0; width: 100%; height: 100px; background: #222; z-index: 1000; overflow: hidden; }
-        #ad-top { top: 0; border-bottom: 1px solid #444; }
-        #ad-bottom { bottom: 0; border-top: 1px solid #444; }
+        
+        /* 上下広告：100px固定 */
+        .ad-container { position: fixed; left: 0; width: 100%; height: 100px; background: #000; z-index: 1000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        #ad-top { top: 0; }
+        #ad-bottom { bottom: 0; }
+
         #game-outer { position: absolute; top: 100px; bottom: 100px; left: 0; right: 0; background: #fff; display: flex; flex-direction: column; z-index: 10; }
         #stat-bar { height: 45px; background: #1e293b; color: white; display: flex; justify-content: space-around; align-items: center; font-size: 11px; position: relative; }
         #fever-bar { position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: #facc15; box-shadow: 0 0 8px #facc15; }
@@ -30,27 +34,22 @@
         .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 500; color: white; }
         #menuScreen { background: rgba(0,0,0,0.95); padding-top: 10px; overflow-y: auto; }
         
-        /* リザルト画面の改善（ここを修正！） */
-        #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; overflow-y: auto; }
-        .result-card { background: #fff; color: #333; width: 92%; border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 95%; }
+        /* リザルト画面：広告なしの時はギュッと寄せる */
+        #resultScreen { background: rgba(0,0,0,0.9); justify-content: center; display: none; z-index: 5000; }
+        .result-card { background: #fff; color: #333; width: 92%; border-radius: 20px; padding: 25px 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 15px; }
         
-        /* 広告ボックスを可変に */
-        #mid-ad-box { margin: 10px 0; min-height: 200px; flex-grow: 1; display: flex; justify-content: center; align-items: center; background: #eee; width: 100%; overflow: hidden; }
+        /* リザルト画面のスクエア枠（デフォルト非表示） */
+        #mid-ad-box { display: none; width: 330px; height: 330px; background: #000; justify-content: center; align-items: center; border-radius: 10px; overflow: hidden; margin: 5px 0; }
 
-        #bigAdScreen { background: #000; z-index: 2000; display: none; justify-content: center; align-items: center; }
-        .ad-frame-wrapper { width: 90%; height: 80%; background: #000; position: relative; border-radius: 10px; overflow: hidden; }
-        .ad-close-btn { 
-            position: absolute; top: 10px; right: 10px; color: white; font-size: 30px; 
-            font-weight: bold; cursor: pointer; background: rgba(0,0,0,0.5); 
-            width: 40px; height: 40px; border-radius: 50%; display: none;
-            align-items: center; justify-content: center; z-index: 2100;
-        }
+        /* 全画面広告（カウントダウン） */
+        #inter-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; }
+        .inter-content { width: 330px; height: 330px; background: #fff; position: relative; border-radius: 8px; }
+        #close-ad-btn { position: absolute; top: -55px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
 
         .ui-btn { border-radius: 35px; border: none; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
         .start-btn { background: #22c55e; color:white; width:260px; padding:15px; font-size:18px; margin-bottom:15px; }
-        .close-btn { background: #3b82f6; color:white; width:100%; padding:14px; font-size:18px; margin-top:10px; transition: opacity 0.3s; }
-        .close-btn:disabled { background: #94a3b8; opacity: 0.6; cursor: default; }
-        .sub-btn { background: #64748b; color: white; width: 100%; padding: 12px; font-size: 14px; margin-top: 10px; }
+        .close-btn { background: #3b82f6; color:white; width:90%; padding:15px; font-size:20px; }
+        .sub-btn { background: #64748b; color: white; width: 90%; padding: 12px; font-size: 14px; }
         
         .shop-box { background: rgba(255,255,255,0.1); width: 94%; border-radius: 12px; padding: 15px; margin: 10px 0; border: 1px solid #475569; }
         .shop-item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; }
@@ -60,7 +59,8 @@
 <body>
 
     <div id="ad-top" class="ad-container">
-        <iframe id="ifr-top" src="ad.html?pos=top" style="border:none; width:100%; height:100px;"></iframe>
+        <ins class="adsbygoogle" style="display:inline-block;width:320px;height:100px" data-ad-client="ca-pub-1299640300068792" data-ad-slot="3972022911"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <div id="game-outer">
@@ -81,56 +81,43 @@
             </div>
             <div style="margin: 15px 0;"><select id="start-stage-select" style="padding:12px; border-radius:10px; width:250px; font-weight:bold;"></select></div>
             <button class="ui-btn start-btn" onclick="startGame()">★ 業務開始 ★</button>
-            <a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:14px; font-weight:bold; border-bottom: 1px solid #3b82f6;">★ 他のゲームはこちら ★</a>
+            <a href="https://saaaachi.github.io/" style="color:#3b82f6; text-decoration:none; font-size:15px; font-weight:bold;">★ 他のゲームはこちら ★</a>
         </div>
 
         <div id="resultScreen" class="overlay">
             <div class="result-card">
-                <h1 style="margin:0; color:#ef4444; font-size:24px;">閉店！</h1>
-                <div style="font-size:16px; margin:5px 0; text-align:left;">
-                    <div style="display:flex; justify-content:space-between;"><span>SCORE:</span><b id="final-score">0</b></div>
-                    <div style="display:flex; justify-content:space-between; color:#f59e0b; margin-top:2px;"><span>獲得賞金:</span><b>💰 <span id="final-coins">0</span></b></div>
+                <h1 style="margin:0; color:#ef4444; font-size:26px;">閉店！</h1>
+                <div style="font-size:18px; text-align:center;">
+                    <div>SCORE: <b id="final-score">0</b></div>
+                    <div style="color:#f59e0b; margin-top:5px;">獲得賞金: <b>💰 <span id="final-coins">0</span></b></div>
                 </div>
-
-                <div id="mid-ad-box">
-                    <div id="im-8b988d7b042a42d5b8df6921b628cf00">
-                        <script async src="https://imp-adedge.i-mobile.co.jp/script/v1/spot.js?20220104"></script>
-                        <script>(window.adsbyimobile=window.adsbyimobile||[]).push({pid:84561,mid:590804,asid:1924211,type:"banner",display:"inline",elementid:"im-8b988d7b042a42d5b8df6921b628cf00"})</script>
-                    </div>
-                </div>
-
-                <button id="res-close-btn" class="ui-btn close-btn" onclick="closeResult()" disabled>読み込み中...</button>
-                <a href="https://saaaachi.github.io/" class="ui-btn sub-btn">★ 他のゲームを遊ぶ ★</a>
+                <div id="mid-ad-box"></div>
+                <button id="res-close-btn" class="ui-btn close-btn" onclick="closeResult()">OK</button>
+                <a href="https://saaaachi.github.io/" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight:bold;">他のゲームを遊ぶ</a>
             </div>
         </div>
 
-        <div id="bigAdScreen" class="overlay">
-            <div class="ad-frame-wrapper">
-                <div id="ad-close-btn" class="ad-close-btn" onclick="closeAd()">×</div>
-                <iframe id="ad-large-frame" src="" style="width:100%; height:100%; border:none;"></iframe>
+        <div id="inter-screen">
+            <div class="inter-content">
+                <div id="close-ad-btn" onclick="closeAd()">5</div>
+                <iframe id="ifr-inter" src="about:blank" style="width:100%; height:100%; border:none; border-radius:8px; background: #fff;"></iframe>
             </div>
         </div>
     </div>
 
     <div id="ad-bottom" class="ad-container">
-        <iframe id="ifr-bottom" src="ad.html?pos=bottom" style="border:none; width:100%; height:100px;"></iframe>
+        <ins class="adsbygoogle" style="display:inline-block;width:320px;height:100px" data-ad-client="ca-pub-1299640300068792" data-ad-slot="3972022911"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <script>
-        // 以前お伝えした「古い30秒リフレッシュ」はここから削除済みです！
-
         let score = 0, stage = 1, currentSessionCoins = 0, customers = [], gameActive = false;
         let userData = { coins: 0, upPatience: 0, upValue: 0, maxUnlockedStage: 1, playCount: 0 };
         let feverGauge = 0, isFever = false;
-        
         const itemMaster = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'];
         const extraRules = [{ icon: '🥐', stage: 3 }, { icon: '🍩', stage: 5 }, { icon: '🍺', stage: 10 }];
 
-        function loadData() {
-            const saved = localStorage.getItem('taskMaster_save');
-            if(saved) userData = {...userData, ...JSON.parse(saved)};
-            updateMenuUI();
-        }
+        function loadData() { const saved = localStorage.getItem('taskMaster_save'); if(saved) userData = {...userData, ...JSON.parse(saved)}; updateMenuUI(); }
         function saveData() { localStorage.setItem('taskMaster_save', JSON.stringify(userData)); }
 
         function startGame() {
@@ -147,46 +134,51 @@
             saveData();
             document.getElementById("final-score").innerText = score;
             document.getElementById("final-coins").innerText = Math.floor(currentSessionCoins);
-            
-            const closeBtn = document.getElementById("res-close-btn");
-            closeBtn.disabled = true;
-            closeBtn.innerText = "お待ちください...";
-            
             document.getElementById("resultScreen").style.display = "flex";
-
-            setTimeout(() => {
-                closeBtn.disabled = false;
-                closeBtn.innerText = "メニューへ戻る";
-            }, 1500);
         }
 
         function closeResult() {
-            document.getElementById("resultScreen").style.display = "none";
-            if (userData.playCount === 2 || (userData.playCount > 2 && (userData.playCount - 2) % 5 === 0)) {
+            const count = userData.playCount;
+            // 2回目、その後5回おきのタイミングで広告
+            if (count === 2 || (count > 2 && (count - 2) % 5 === 0)) {
                 showBigAd();
             } else {
+                document.getElementById("resultScreen").style.display = "none";
                 showMenu();
             }
         }
 
         function showBigAd() {
-            const screen = document.getElementById("bigAdScreen");
-            const closeBtn = document.getElementById("ad-close-btn");
-            const frame = document.getElementById("ad-large-frame");
-            frame.src = "ad.large.html?t=" + Date.now(); 
+            const screen = document.getElementById("inter-screen");
+            const closeBtn = document.getElementById("close-ad-btn");
+            const ifr = document.getElementById("ifr-inter");
+            ifr.src = "ad.large.html?v=" + Date.now();
             screen.style.display = "flex";
-            closeBtn.style.display = "none";
-            setTimeout(() => { closeBtn.style.display = "flex"; }, 5000);
+            let timer = 5;
+            closeBtn.innerText = timer;
+            closeBtn.style.pointerEvents = "none";
+            closeBtn.style.background = "#555";
+            const countdown = setInterval(() => {
+                timer--;
+                if (timer > 0) {
+                    closeBtn.innerText = timer;
+                } else {
+                    clearInterval(countdown);
+                    closeBtn.innerText = "×";
+                    closeBtn.style.background = "#ff4444";
+                    closeBtn.style.pointerEvents = "auto";
+                }
+            }, 1000);
         }
 
         function closeAd() {
-            document.getElementById("bigAdScreen").style.display = "none";
-            document.getElementById("ad-large-frame").src = "";
+            document.getElementById("inter-screen").style.display = "none";
+            document.getElementById("resultScreen").style.display = "none";
+            document.getElementById("ifr-inter").src = "about:blank";
             showMenu();
         }
 
         function showMenu() { updateMenuUI(); document.getElementById("menuScreen").style.display = "flex"; }
-        
         function buy(type) {
             let cost = (type === 'patience') ? (userData.upPatience + 1) * 500 : (type === 'value') ? [10, 100, 300, 700, 1500, 3000, 7000, 15000, 50000][Math.min(userData.upValue, 8)] : userData.maxUnlockedStage * 1000;
             if(userData.coins >= cost) { userData.coins -= cost; if(type === 'patience') userData.upPatience++; else if(type === 'value') userData.upValue++; else userData.maxUnlockedStage++; saveData(); updateMenuUI(); }
