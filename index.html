@@ -6,10 +6,11 @@
     <title>Task Master Deluxe - Max Revenue</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1299640300068792" crossorigin="anonymous"></script>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        /* touch-action: manipulation でダブルタップズームを防止 */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; touch-action: manipulation; }
         body { background: #0f172a; font-family: sans-serif; overflow: hidden; color: white; position: fixed; width: 100%; height: 100%; }
         
-        /* 上部広告：100px固定・中央寄せ */
+        /* 上部広告：100px固定 */
         #ad-top-container { position: fixed; top: 0; left: 0; width: 100%; height: 100px; background: #000; z-index: 9999; overflow: hidden; display: flex; justify-content: center; align-items: center; }
 
         /* ゲーム画面エリア */
@@ -29,25 +30,22 @@
         .patience-fill { height: 100%; background: #22c55e; }
 
         #action-panel { height: 155px; background: #fff; border-top: 2px solid #e2e8f0; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; padding: 10px; }
-        .task-btn { border-radius: 10px; border: 1px solid #e2e8f0; font-size: 28px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
+        .task-btn { border-radius: 10px; border: 1px solid #e2e8f0; font-size: 32px; background: #f8fafc; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px #cbd5e1; cursor: pointer; }
         .task-btn:active { transform: translateY(2px); box-shadow: 0 2px #cbd5e1; }
         .task-btn.locked { visibility: hidden; }
 
-        /* オーバーレイ (メニュー) */
+        /* オーバーレイ */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 2000; display: flex; flex-direction: column; align-items: center; padding: 110px 15px 20px; overflow-y: auto; color: white; }
         .shop-card { width: 100%; background: #1e293b; margin: 4px 0; padding: 12px 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
         .buy-btn { background: #facc15; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         #start-btn { margin-top: 15px; width: 100%; min-height: 60px; border-radius: 30px; border: none; background: #22c55e; color: white; font-size: 20px; font-weight: bold; flex-shrink: 0; }
 
-        /* リザルト画面 */
         #result-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.98); z-index: 5000; flex-direction: column; align-items: center; justify-content: center; padding: 10px; color: white; }
         .res-box { background: #1e293b; padding: 20px 15px; border-radius: 20px; border: 2px solid #facc15; width: 95%; max-width: 380px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .ok-btn { padding: 12px; border-radius: 30px; border: none; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; font-size: 18px; width: 85%; }
         
-        /* リザルト広告枠：300x250サイズ */
         #mid-ad-box { width: 300px; height: 250px; background: #000; margin: 5px 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        /* 5秒広告スクリーン */
         #inter-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99999; align-items: center; justify-content: center; }
         .inter-content { width: 330px; height: 330px; background: #fff; position: relative; border-radius: 8px; }
         #close-ad-btn { position: absolute; top: -50px; right: 0px; width: 45px; height: 45px; background: #333; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; border: 2px solid #fff; cursor: pointer; }
@@ -88,17 +86,11 @@
         <div class="res-box">
             <h1 id="res-title" style="color:#ef4444; font-size: 24px;">閉店！</h1>
             <p style="font-size:18px;">獲得: 💰<span id="res-coins">0</span></p>
-            
             <div id="mid-ad-box">
-                <ins class="adsbygoogle"
-                     style="display:inline-block;width:300px;height:250px"
-                     data-ad-client="ca-pub-1299640300068792"
-                     data-ad-slot="9050127185"></ins>
+                <ins class="adsbygoogle" style="display:inline-block;width:300px;height:250px" data-ad-client="ca-pub-1299640300068792" data-ad-slot="9050127185"></ins>
                 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
             </div>
-
             <button onclick="handleResultOK()" class="ok-btn">OK</button>
-            <a href="https://saaaachi.github.io/" style="color: #3b82f6; text-decoration: none; font-size: 14px;">他のゲームを遊ぶ</a>
         </div>
     </div>
 
@@ -113,6 +105,8 @@
         let userData = { coins: 0, upP: 0, upV: 0, maxS: 1, playCount: 0 };
         let score = 0, stage = 1, sessCoins = 0, customers = [], gameActive = false, feverGauge = 0, isFever = false;
         const items = ['🍎', '🌽', '🥤', '🥐', '🍩', '🍺'], rules = [{ icon: '🥐', s: 3 }, { icon: '🍩', s: 5 }, { icon: '🍺', s: 10 }];
+        // お客さんのバリエーション
+        const avatars = ['👧🏻', '👦🏻', '👩🏼‍🦱', '👱🏽‍♀️', '👱‍♂️', '👷🏼‍♂️', '👵', '👨‍🍳'];
 
         function load() { const saved = localStorage.getItem('task_master_vmax'); if(saved) userData = {...userData, ...JSON.parse(saved)}; updateUI(); }
         function save() { localStorage.setItem('task_master_vmax', JSON.stringify(userData)); }
@@ -159,26 +153,40 @@
             const max = 2 + Math.floor(stage / 3);
             if(customers.length < max) {
                 let pool = items.filter(icon => { const r = rules.find(x => x.icon === icon); return !r || stage >= r.s; });
-                let biz = Math.random() < 0.15, count = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1), order = [];
+                let biz = Math.random() < 0.15;
+                let count = (stage >= 12) ? 3 : (stage >= 3 ? 2 : 1);
+                let order = [];
                 for(let i=0; i<count; i++) order.push(pool[Math.floor(Math.random() * pool.length)]);
-                customers.push({ id: Date.now(), initial: [...order], current: order, p: 100, biz: biz });
+                
+                // ランダムな見た目を付与
+                let visual = biz ? '💼' : avatars[Math.floor(Math.random() * avatars.length)];
+                
+                // current: まだ提供していないアイテム / initial: 最初の注文内容
+                customers.push({ id: Date.now(), initial: [...order], current: [...order], p: 100, biz: biz, visual: visual });
             }
             setTimeout(spawn, Math.max(800, 2000 - (stage * 100)));
         }
 
         function provide(item) {
             if(!gameActive) return;
+            // お客さん全員をチェック
             for(let i=0; i<customers.length; i++) {
-                if(customers[i].current[0] === item) {
-                    customers[i].current.shift();
-                    let price = (10 + (userData.upV * 3)) * (isFever ? 3 : 1) * (customers[i].biz ? 5 : 1);
+                let c = customers[i];
+                // 注文内容の中にタップされたアイテムがあるか確認
+                let idx = c.current.indexOf(item);
+                if(idx !== -1) {
+                    // 見つかったら、そのアイテムを注文から消す
+                    c.current.splice(idx, 1);
+                    
+                    let price = (10 + (userData.upV * 3)) * (isFever ? 3 : 1) * (c.biz ? 5 : 1);
                     userData.coins += price; sessCoins += price;
-                    if(customers[i].current.length === 0) {
+                    
+                    if(c.current.length === 0) {
                         score += 100; customers.splice(i, 1);
                         if(!isFever) { feverGauge += 10; if(feverGauge >= 100) startFever(); }
                         if(score % 1000 === 0) { stage++; updateButtons(); }
                     }
-                    render(); return;
+                    render(); return; // 1タップで1つだけ処理
                 }
             }
         }
@@ -197,11 +205,20 @@
             customers.forEach(c => {
                 const div = document.createElement("div"); div.className = "customer" + (c.biz ? " businessman" : "");
                 let oHtml = '<div class="order-container">';
-                c.initial.forEach((item, idx) => {
-                    const done = !c.current.includes(item) && (c.current.length < c.initial.length - idx);
-                    oHtml += `<div class="order-slot ${done ? 'done' : ''}">${item}</div>`;
+                
+                // 表示用ロジック：完了した分を透明にする
+                let tempCurrent = [...c.current];
+                c.initial.forEach((item) => {
+                    let idx = tempCurrent.indexOf(item);
+                    if(idx !== -1) {
+                        oHtml += `<div class="order-slot">${item}</div>`;
+                        tempCurrent.splice(idx, 1);
+                    } else {
+                        oHtml += `<div class="order-slot done">${item}</div>`;
+                    }
                 });
-                div.innerHTML = `<div style="font-size:38px;">${c.biz?'💼':'👤'}</div>${oHtml}</div><div class="patience-bar"><div class="patience-fill" style="width:${c.p}%; background:${c.p>30?'#22c55e':'#ef4444'}"></div></div>`;
+                
+                div.innerHTML = `<div style="font-size:38px;">${c.visual}</div>${oHtml}</div><div class="patience-bar"><div class="patience-fill" style="width:${c.p}%; background:${c.p>30?'#22c55e':'#ef4444'}"></div></div>`;
                 area.appendChild(div);
             });
             document.getElementById('score-txt').innerText = "SCORE: " + score;
